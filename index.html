@@ -9,27 +9,24 @@
 * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
 body { background: #0a0e1a; overflow: hidden; font-family: -apple-system, sans-serif; color: #fff; height: 100vh; width: 100vw; }
 
-/* ЗАСТАВКА */
 #splash { position: fixed; inset: 0; z-index: 100; transition: opacity 0.6s ease; }
 #splash.hidden { opacity: 0; pointer-events: none; }
 #splash img { width: 100%; height: 100%; object-fit: cover; }
 
-/* МЕНЮ */
-#menu {
-  position: fixed; inset: 0; display: none;
-  flex-direction: column; align-items: center; justify-content: flex-end;
-  padding: 40px 30px 60px;
-  z-index: 50;
-}
-#menu.visible { display: flex; }
+#menu { position: fixed; inset: 0; display: none; }
+#menu.visible { display: block; }
 
-#menu-bg {
-  position: absolute; inset: 0; z-index: -1;
+#menu-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+#menu-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(10,14,26,0.1) 0%, rgba(10,14,26,0.9) 100%);
 }
-#menu-bg img { width: 100%; height: 100%; object-fit: cover; }
-#menu-bg::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(10,14,26,0.2) 0%, rgba(10,14,26,0.85) 100%);
+
+.menu-buttons {
+  position: absolute; bottom: 60px; left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0 30px;
 }
 
 .menu-btn {
@@ -44,20 +41,19 @@ body { background: #0a0e1a; overflow: hidden; font-family: -apple-system, sans-s
 </head>
 <body>
 
-<!-- ЗАСТАВКА -->
 <div id="splash">
   <img src="assets/splash.PNG" alt="Exile Empire">
 </div>
 
-<!-- МЕНЮ с фоном Planet.PNG -->
 <div id="menu">
-  <div id="menu-bg">
-    <img src="assets/Planet.PNG" alt="">
+  <img id="menu-bg" src="assets/Planet.PNG" alt="">
+  <div id="menu-overlay"></div>
+  <div class="menu-buttons">
+    <div class="menu-btn gold" onclick="startGame()">▶ PLAY</div>
+    <div class="menu-btn" onclick="alert('В разработке')">PROFILE</div>
+    <div class="menu-btn" onclick="alert('В разработке')">SHOP</div>
+    <div class="menu-btn" onclick="alert('В разработке')">SETTINGS</div>
   </div>
-  <div class="menu-btn gold" onclick="startGame()">▶ PLAY</div>
-  <div class="menu-btn" onclick="alert('В разработке')">PROFILE</div>
-  <div class="menu-btn" onclick="alert('В разработке')">SHOP</div>
-  <div class="menu-btn" onclick="alert('В разработке')">SETTINGS</div>
 </div>
 
 <script>
