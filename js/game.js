@@ -2,9 +2,9 @@
 // Добавляй новые карты сюда. col/row — позиция в сетке (0 или 1).
 var MAPS = [
   { file: "maps/map_01.PNG", col: 0, row: 0 },
-  { file: "maps/map_02.PNG", col: 1, row: 0 }
-  // { file: "maps/map_03.PNG", col: 0, row: 1 },
-  // { file: "maps/map_04.PNG", col: 1, row: 1 }
+  { file: "maps/map_2.PNG", col: 1, row: 0 },
+  { file: "maps/map_3.PNG", col: 0, row: 1 },
+  { file: "maps/map_4.PNG", col: 1, row: 1 }
 ];
 
 var TILE = 1024;
