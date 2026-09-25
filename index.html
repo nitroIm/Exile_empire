@@ -6,15 +6,13 @@
 <title>Exile Empire</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #0a0e1a; overflow: hidden; font-family: -apple-system, sans-serif; color: #fff; height: 100vh; width: 100vw; }
 
-/* ЗАСТАВКА */
 #splash { position: fixed; inset: 0; z-index: 100; }
 #splash.hidden { display: none; }
 #splash img { width: 100%; height: 100%; object-fit: cover; }
 
-/* МЕНЮ */
 #menu { position: fixed; inset: 0; display: none; }
 #menu.visible { display: block; }
 #menu img.bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -24,42 +22,16 @@ body { background: #0a0e1a; overflow: hidden; font-family: -apple-system, sans-s
 .menu-btn { width: 100%; max-width: 320px; padding: 18px; margin-bottom: 14px; font-size: 16px; letter-spacing: 2px; font-weight: 600; color: #fff; background: linear-gradient(135deg, #0a1430, #102850); border: 2px solid #00e0d0; border-radius: 14px; text-align: center; }
 .menu-btn.gold { border-color: #d4a020; }
 
-/* ИГРА */
 #game { position: fixed; inset: 0; display: none; overflow: hidden; }
 #game.visible { display: block; }
 
-/* Карта — двигается пальцем */
-#world {
-  position: absolute;
-  width: 4096px;
-  height: 4096px;
-  top: 0;
-  left: 0;
-  transition: none;
-}
+#world { position: absolute; width: 4096px; height: 4096px; top: 0; left: 0; }
 #world img { width: 100%; height: 100%; display: block; }
 
-/* Панель ресурсов */
-#resources {
-  position: fixed; top: 0; left: 0; right: 0;
-  display: flex; justify-content: space-around;
-  padding: 15px; background: rgba(10,14,26,0.85);
-  font-size: 14px; z-index: 10;
-}
+#resources { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; padding: 15px; background: rgba(10,14,26,0.85); font-size: 14px; z-index: 10; }
 
-/* Кнопки снизу */
-#bottom-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  display: flex; justify-content: space-around;
-  padding: 12px; background: rgba(10,14,26,0.85);
-  z-index: 10;
-}
-.bottom-btn {
-  flex: 1; padding: 14px 8px; margin: 0 4px;
-  font-size: 12px; letter-spacing: 1px; color: #fff; text-align: center;
-  background: linear-gradient(135deg, #0a1430, #102850);
-  border: 2px solid #00e0d0; border-radius: 12px;
-}
+#bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: space-around; padding: 12px; background: rgba(10,14,26,0.85); z-index: 10; }
+.bottom-btn { flex: 1; padding: 14px 8px; margin: 0 4px; font-size: 12px; color: #fff; text-align: center; background: linear-gradient(135deg, #0a1430, #102850); border: 2px solid #00e0d0; border-radius: 12px; }
 .bottom-btn.gold { border-color: #d4a020; }
 </style>
 </head>
@@ -84,13 +56,11 @@ body { background: #0a0e1a; overflow: hidden; font-family: -apple-system, sans-s
   <div id="world">
     <img src="assets/map_01.PNG">
   </div>
-
   <div id="resources">
-    <span>🪙 <span id="metal">0</span></span>
-    <span>💎 <span id="crystal">0</span></span>
-    <span>⭐ <span id="stars">0</span></span>
+    <span>🪙 0</span>
+    <span>💎 0</span>
+    <span>⭐ 0</span>
   </div>
-
   <div id="bottom-bar">
     <div class="bottom-btn gold">🏗 СТРОИТЬ</div>
     <div class="bottom-btn">⚔️ БОЙ</div>
@@ -116,26 +86,22 @@ window.startGame = function() {
   initMapDrag();
 };
 
-// ====== СВАЙП КАРТЫ ======
 function initMapDrag() {
   const world = document.getElementById('world');
-  let startX = 0, startY = 0;
-  let worldX = 0, worldY = 0;
-  let isDragging = false;
+  let startX = 0, startY = 0, worldX = 0, worldY = 0, drag = false;
 
-  // Изначально центрируем карту
   worldX = -(4096 - window.innerWidth) / 2;
   worldY = -(4096 - window.innerHeight) / 2;
   world.style.transform = `translate(${worldX}px, ${worldY}px)`;
 
   world.addEventListener('touchstart', (e) => {
-    isDragging = true;
+    drag = true;
     startX = e.touches[0].clientX - worldX;
     startY = e.touches[0].clientY - worldY;
   });
 
   world.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
+    if (!drag) return;
     e.preventDefault();
     worldX = e.touches[0].clientX - startX;
     worldY = e.touches[0].clientY - startY;
@@ -143,17 +109,13 @@ function initMapDrag() {
     world.style.transform = `translate(${worldX}px, ${worldY}px)`;
   });
 
-  world.addEventListener('touchend', () => { isDragging = false; });
+  world.addEventListener('touchend', () => { drag = false; });
 
   function clamp() {
-    const maxX = 0;
-    const minX = -(4096 - window.innerWidth);
-    const maxY = 0;
-    const minY = -(4096 - window.innerHeight);
-    if (worldX > maxX) worldX = maxX;
-    if (worldX < minX) worldX = minX;
-    if (worldY > maxY) worldY = maxY;
-    if (worldY < minY) worldY = minY;
+    if (worldX > 0) worldX = 0;
+    if (worldX < -(4096 - window.innerWidth)) worldX = -(4096 - window.innerWidth);
+    if (worldY > 0) worldY = 0;
+    if (worldY < -(4096 - window.innerHeight)) worldY = -(4096 - window.innerHeight);
   }
 }
 </script>
