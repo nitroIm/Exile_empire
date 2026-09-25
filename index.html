@@ -2,117 +2,41 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Стратегия</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; background: #1a1a2e; }
-        canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
-        #error {
-            position: fixed; top: 10px; left: 10px; right: 10px;
-            background: rgba(255,0,0,0.9); color: white; padding: 10px;
-            font-family: monospace; font-size: 14px; z-index: 100;
-            display: none; word-break: break-all;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест карты</title>
 </head>
-<body>
-<div id="error"></div>
-<canvas id="game"></canvas>
+<body style="margin:0; background:#222; color:#0f0; font-family:monospace; font-size:20px; padding:20px;">
+    <div id="status">Загрузка...</div>
+    <img id="test" style="max-width:100%; margin-top:20px; display:block;">
+
 <script>
-    const errorBox = document.getElementById('error');
-    function showError(msg) {
-        errorBox.style.display = 'block';
-        errorBox.textContent = msg;
-        console.error(msg);
-    }
+    const status = document.getElementById('status');
+    const img = document.getElementById('test');
 
-    const canvas = document.getElementById('game');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
+    // Пробуем разные варианты имени
+    const names = ['map_01.PNG', 'map_01.png', 'map_01.jpg', 'map_01.jpeg', 'map_01.webp'];
+    let index = 0;
 
-    // Пробуем сначала .PNG, если не выйдет — .png
-    let triedLowercase = false;
-    img.onerror = () => {
-        if (!triedLowercase) {
-            triedLowercase = true;
-            console.log('Пробую map_01.png...');
-            img.src = 'map_01.png';
-        } else {
-            showError('Картинка не найдена! Проверь: 1) файл лежит рядом с index.html 2) имя точно map_01.PNG или map_01.png');
+    function tryNext() {
+        if (index >= names.length) {
+            status.textContent = '❌ НИ ОДИН ФАЙЛ НЕ НАЙДЕН. Проверь имена: ' + names.join(', ');
+            return;
         }
-    };
+        const name = names[index];
+        status.textContent = '⏳ Пробую: ' + name;
+        img.src = name;
+    }
 
     img.onload = () => {
-        console.log('Карта загружена:', img.width, 'x', img.height);
-        resize();
+        status.textContent = '✅ ЗАГРУЖЕНО: ' + img.src.split('/').pop() + ' | Размер: ' + img.naturalWidth + 'x' + img.naturalHeight;
     };
 
-    img.src = 'map_01.PNG';
+    img.onerror = () => {
+        index++;
+        tryNext();
+    };
 
-    let camera = { x: 0, y: 0, zoom: 0.4 };
-    let lastTouch = null;
-
-    const COLS = 8;
-    const ROWS = 8;
-    const TILE = 1024;
-
-    function resize() {
-        canvas.width = window.innerWidth * window.devicePixelRatio;
-        canvas.height = window.innerHeight * window.devicePixelRatio;
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-        draw();
-    }
-
-    function draw() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        ctx.clearRect(0, 0, w, h);
-
-        if (!img.complete || img.naturalWidth === 0) return;
-
-        ctx.save();
-        ctx.translate(w / 2 + camera.x, h / 2 + camera.y);
-        ctx.rotate(Math.PI / 4);
-        ctx.scale(camera.zoom, camera.zoom * 0.5);
-
-        const offsetX = -(COLS * TILE) / 2;
-        const offsetY = -(ROWS * TILE) / 2;
-
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                ctx.drawImage(img, offsetX + c * TILE, offsetY + r * TILE, TILE, TILE);
-            }
-        }
-
-        ctx.restore();
-    }
-
-    canvas.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-            lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-        }
-    });
-
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        if (e.touches.length === 1 && lastTouch) {
-            camera.x += e.touches[0].clientX - lastTouch.x;
-            camera.y += e.touches[0].clientY - lastTouch.y;
-            lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-            draw();
-        }
-    });
-
-    canvas.addEventListener('touchend', () => { lastTouch = null; });
-
-    window.addEventListener('resize', resize);
-
-    if (window.Telegram?.WebApp) {
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
-    }
+    tryNext();
 </script>
 </body>
 </html>
