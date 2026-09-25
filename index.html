@@ -79,7 +79,7 @@ window.startGame = function() {
 };
 
 function initMapDrag() {
-Content  var world = document.getElementById('world');
+  var world = document.getElementById('world');
   var startX = 0, startY = 0, worldX = 0, worldY = 0, drag = false;
 
   worldX = -(1024 - window.innerWidth) / 2;
@@ -114,12 +114,12 @@ try {
   const { getFirestore, doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
   const firebaseConfig = {
-    apiKey: "ВСТАВЬ_API_KEY",
-    authDomain: "ВСТАВЬ_AUTH_DOMAIN",
-    projectId: "ВСТАВЬ_PROJECT_ID",
-    storageBucket: "ВСТАВЬ_STORAGE_BUCKET",
-    messagingSenderId: "ВСТАВЬ_SENDER_ID",
-    appId: "ВСТАВЬ_APP_ID"
+    apiKey: "AIzaSyAaAMt8O1pNfF7O2TJkWSyyvv6Ndp5XHfU",
+    authDomain: "exile-empire.firebaseapp.com",
+    projectId: "exile-empire",
+    storageBucket: "exile-empire.firebasestorage.app",
+    messagingSenderId: "465765692374",
+    appId: "1:465765692374:web:c6b984f3ba91ecc22c2a77"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -132,7 +132,7 @@ try {
       if (snap.exists()) {
         const d = snap.data();
         document.getElementById('metal').textContent = d.metal || 0;
-        document.getElementById =('crystal').text d.crystal || 0;
+        document.getElementById('crystal').textContent = d.crystal || 0;
         document.getElementById('stars').textContent = d.stars || 0;
       } else {
         await setDoc(docRef, { metal: 500, crystal: 200, stars: 0 });
@@ -142,6 +142,7 @@ try {
       }
     } catch(e) {
       console.log('Firebase load error:', e);
+      document.getElementById('metal').textContent = 'ERR';
     }
   };
 } catch(e) {
