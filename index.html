@@ -8,24 +8,54 @@
     <style>
         body { margin: 0; overflow: hidden; background: #1a1a2e; }
         canvas { display: block; width: 100vw; height: 100vh; touch-action: none; }
+        #error {
+            position: fixed; top: 10px; left: 10px; right: 10px;
+            background: rgba(255,0,0,0.9); color: white; padding: 10px;
+            font-family: monospace; font-size: 14px; z-index: 100;
+            display: none; word-break: break-all;
+        }
     </style>
 </head>
 <body>
+<div id="error"></div>
 <canvas id="game"></canvas>
 <script>
+    const errorBox = document.getElementById('error');
+    function showError(msg) {
+        errorBox.style.display = 'block';
+        errorBox.textContent = msg;
+        console.error(msg);
+    }
+
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
     const img = new Image();
-    img.src = 'map_01.PNG'; // Твой файл
 
-    // Камера (положение и зум)
+    // Пробуем сначала .PNG, если не выйдет — .png
+    let triedLowercase = false;
+    img.onerror = () => {
+        if (!triedLowercase) {
+            triedLowercase = true;
+            console.log('Пробую map_01.png...');
+            img.src = 'map_01.png';
+        } else {
+            showError('Картинка не найдена! Проверь: 1) файл лежит рядом с index.html 2) имя точно map_01.PNG или map_01.png');
+        }
+    };
+
+    img.onload = () => {
+        console.log('Карта загружена:', img.width, 'x', img.height);
+        resize();
+    };
+
+    img.src = 'map_01.PNG';
+
     let camera = { x: 0, y: 0, zoom: 0.4 };
     let lastTouch = null;
 
-    // Размер карты в тайлах (8 на 8 = 64 куска)
     const COLS = 8;
     const ROWS = 8;
-    const TILE = 1024; // Размер одного куска
+    const TILE = 1024;
 
     function resize() {
         canvas.width = window.innerWidth * window.devicePixelRatio;
@@ -40,33 +70,25 @@
         const h = window.innerHeight;
         ctx.clearRect(0, 0, w, h);
 
-        // Изометрический наклон
+        if (!img.complete || img.naturalWidth === 0) return;
+
         ctx.save();
         ctx.translate(w / 2 + camera.x, h / 2 + camera.y);
-        ctx.rotate(Math.PI / 4);           // Поворот на 45 градусов
-        ctx.scale(camera.zoom, camera.zoom * 0.5); // Сплющивание по вертикали (изометрия)
+        ctx.rotate(Math.PI / 4);
+        ctx.scale(camera.zoom, camera.zoom * 0.5);
 
-        // Центрируем карту
         const offsetX = -(COLS * TILE) / 2;
         const offsetY = -(ROWS * TILE) / 2;
 
-        // Рисуем тайлы
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
-                ctx.drawImage(
-                    img,
-                    offsetX + c * TILE,
-                    offsetY + r * TILE,
-                    TILE,
-                    TILE
-                );
+                ctx.drawImage(img, offsetX + c * TILE, offsetY + r * TILE, TILE, TILE);
             }
         }
 
         ctx.restore();
     }
 
-    // Управление пальцем
     canvas.addEventListener('touchstart', (e) => {
         if (e.touches.length === 1) {
             lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -85,10 +107,8 @@
 
     canvas.addEventListener('touchend', () => { lastTouch = null; });
 
-    img.onload = () => { resize(); };
     window.addEventListener('resize', resize);
 
-    // Инициализация Telegram
     if (window.Telegram?.WebApp) {
         Telegram.WebApp.ready();
         Telegram.WebApp.expand();
