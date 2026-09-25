@@ -31,11 +31,11 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 <body>
 
 <div id="splash">
-<img src="assets/splash.PNG" alt="splash">
+<img src="https://nitroIm.github.io/Exile_empire/assets/splash.PNG" alt="splash">
 </div>
 
 <div id="menu">
-<img class="bg" src="assets/Planet.PNG" alt="bg">
+<img class="bg" src="https://nitroIm.github.io/Exile_empire/assets/Planet.PNG" alt="bg">
 <div class="dark"></div>
 <div class="buttons">
 <div class="menu-btn gold" onclick="startGame()">PLAY</div>
@@ -47,12 +47,12 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 
 <div id="game">
 <div id="world">
-<img src="maps/map_01.PNG" alt="map">
+<img src="https://nitroIm.github.io/Exile_empire/maps/map_01.PNG" alt="map">
 </div>
 <div id="resources">
-<span>METAL 0</span>
-<span>CRYSTAL 0</span>
-<span>STARS 0</span>
+<span>METAL <span id="metal">0</span></span>
+<span>CRYSTAL <span id="crystal">0</span></span>
+<span>STARS <span id="stars">0</span></span>
 </div>
 <div id="bottom-bar">
 <div class="bottom-btn gold">BUILD</div>
@@ -62,7 +62,23 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 </div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ВСТАВЬ СВОИ КЛЮЧИ ИЗ FIREBASE ЗДЕСЬ
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "exile-empire.firebaseapp.com",
+  projectId: "exile-empire",
+  storageBucket: "exile-empire.appspot.com",
+  messagingSenderId: "...",
+  appId: "..."
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
@@ -71,11 +87,31 @@ setTimeout(function() {
   document.getElementById('menu').className = 'visible';
 }, 4000);
 
-function startGame() {
+window.startGame = async function() {
   document.getElementById('menu').className = '';
   document.getElementById('game').className = 'visible';
   initMapDrag();
-}
+
+  // Загрузка данных игрока из Firebase
+  try {
+    const playerId = 'test_user_1';
+    const docRef = doc(db, 'players', playerId);
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      document.getElementById('metal').textContent = data.metal || 0;
+      document.getElementById('crystal').textContent = data.crystal || 0;
+      document.getElementById('stars').textContent = data.stars || 0;
+    } else {
+      await setDoc(docRef, { metal: 500, crystal: 200, stars: 0 });
+      document.getElementById('metal').textContent = 500;
+      document.getElementById('crystal').textContent = 200;
+      document.getElementById('stars').textContent = 0;
+    }
+  } catch (e) {
+    console.log('Firebase error:', e);
+  }
+};
 
 function initMapDrag() {
   var world = document.getElementById('world');
