@@ -31,11 +31,11 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 <body>
 
 <div id="splash">
-<img src="assets/splash.PNG" alt="splash">
+<img src="https://nitroIm.github.io/Exile_empire/assets/splash.PNG" alt="splash">
 </div>
 
 <div id="menu">
-<img class="bg" src="assets/Planet.PNG" alt="bg">
+<img class="bg" src="https://nitroIm.github.io/Exile_empire/assets/Planet.PNG" alt="bg">
 <div class="dark"></div>
 <div class="buttons">
 <div class="menu-btn gold" onclick="startGame()">PLAY</div>
@@ -47,7 +47,7 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 
 <div id="game">
 <div id="world">
-<img src="assets/maps/map_01.PNG" alt="map">
+<img src="https://nitroIm.github.io/Exile_empire/assets/maps/map_01.PNG" alt="map">
 </div>
 <div id="resources">
 <span>METAL 0</span>
@@ -66,10 +66,11 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
+// Заставка показывается 4 секунды, потом меню
 setTimeout(function() {
   document.getElementById('splash').className = 'hidden';
   document.getElementById('menu').className = 'visible';
-}, 3000);
+}, 4000);
 
 function startGame() {
   document.getElementById('menu').className = '';
