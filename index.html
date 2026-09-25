@@ -20,8 +20,8 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 .menu-btn.gold { border-color: #d4a020; }
 #game { position: fixed; top:0; left:0; right:0; bottom:0; display: none; overflow: hidden; }
 #game.visible { display: block; }
-#world { position: absolute; top:0; left:0; width: 1024px; height: 1024px; }
-#world img { width: 100%; height: 100%; display: block; }
+#world { position: absolute; top:0; left:0; }
+#world img { display: block; width: 1024px; height: 1024px; }
 #resources { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; padding: 15px; background: rgba(10,14,26,0.85); font-size: 14px; z-index: 10; }
 #bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; padding: 12px; background: rgba(10,14,26,0.85); z-index: 10; }
 .bottom-btn { flex: 1; padding: 14px 8px; margin: 0 4px; font-size: 12px; color: #fff; text-align: center; background: #0a1430; border: 2px solid #00e0d0; border-radius: 12px; }
@@ -46,9 +46,7 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 </div>
 
 <div id="game">
-<div id="world">
-<img src="maps/map_01.PNG" alt="map">
-</div>
+<div id="world"></div>
 <div id="resources">
 <span>METAL <span id="metal">0</span></span>
 <span>CRYSTAL <span id="crystal">0</span></span>
@@ -63,48 +61,123 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 </div>
 
 <script>
+// ================= КАРТЫ =================
+// Каждая карта 1024x1024. Добавляй сюда новые по мере готовности.
+// col — столбец (0 = левая, 1 = правая), row — строка (0 = верх, 1 = низ).
+var MAPS = [
+  { file: "maps/map_01.PNG", col: 0, row: 0 },
+  { file: "maps/map_02.PNG", col: 1, row: 0 }
+  // { file: "maps/map_03.PNG", col: 0, row: 1 },
+  // { file: "maps/map_04.PNG", col: 1, row: 1 }
+];
+
+var TILE = 1024;
+var WORLD_W = 2048; // ширина мира (2 колонки)
+var WORLD_H = 2048; // высота мира (2 строки)
+
+// Собираем мир из карт
+(function buildWorld() {
+  var world = document.getElementById('world');
+  world.style.width = WORLD_W + 'px';
+  world.style.height = WORLD_H + 'px';
+  MAPS.forEach(function(m) {
+    var img = document.createElement('img');
+    img.src = m.file;
+    img.style.position = 'absolute';
+    img.style.left = (m.col * TILE) + 'px';
+    img.style.top = (m.row * TILE) + 'px';
+    img.style.width = TILE + 'px';
+    img.style.height = TILE + 'px';
+    img.onerror = function() { this.style.display = 'none'; }; // если карты нет — просто не показываем
+    world.appendChild(img);
+  });
+})();
+
+// ================= TELEGRAM =================
 var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
 setTimeout(function() {
   document.getElementById('splash').className = 'hidden';
   document.getElementById('menu').className = 'visible';
-}, 4000);
+}, 7000); // <<< ЗАСТАВКА 7 СЕКУНД
 
 window.startGame = function() {
   document.getElementById('menu').className = '';
   document.getElementById('game').className = 'visible';
-  initMapDrag();
+  initMap();
   if (window.loadPlayer) window.loadPlayer();
 };
 
-function initMapDrag() {
+// ================= СВАЙП + ЗУМ =================
+function initMap() {
   var world = document.getElementById('world');
-  var startX = 0, startY = 0, worldX = 0, worldY = 0, drag = false;
+  var posX = 0, posY = 0, scale = 1;
 
-  worldX = -(1024 - window.innerWidth) / 2;
-  worldY = -(1024 - window.innerHeight) / 2;
-  world.style.transform = 'translate(' + worldX + 'px, ' + worldY + 'px)';
+  // центрируем
+  posX = -(WORLD_W - window.innerWidth) / 2;
+  posY = -(WORLD_H - window.innerHeight) / 2;
+  apply();
+
+  var startX = 0, startY = 0;
+  var startDist = 0, startScale = 1;
+  var dragging = false, pinching = false;
 
   world.addEventListener('touchstart', function(e) {
-    drag = true;
-    startX = e.touches[0].clientX - worldX;
-    startY = e.touches[0].clientY - worldY;
+    if (e.touches.length === 1) {
+      dragging = true;
+      startX = e.touches[0].clientX - posX;
+      startY = e.touches[0].clientY - posY;
+    } else if (e.touches.length === 2) {
+      dragging = false;
+      pinching = true;
+      startDist = distance(e.touches[0], e.touches[1]);
+      startScale = scale;
+    }
   });
 
   world.addEventListener('touchmove', function(e) {
-    if (!drag) return;
     e.preventDefault();
-    worldX = e.touches[0].clientX - startX;
-    worldY = e.touches[0].clientY - startY;
-    if (worldX > 0) worldX = 0;
-    if (worldX < -(1024 - window.innerWidth)) worldX = -(1024 - window.innerWidth);
-    if (worldY > 0) worldY = 0;
-    if (worldY < -(1024 - window.innerHeight)) worldY = -(1024 - window.innerHeight);
-    world.style.transform = 'translate(' + worldX + 'px, ' + worldY + 'px)';
+    if (dragging && e.touches.length === 1) {
+      posX = e.touches[0].clientX - startX;
+      posY = e.touches[0].clientY - startY;
+      clamp();
+      apply();
+    } else if (pinching && e.touches.length === 2) {
+      var d = distance(e.touches[0], e.touches[1]);
+      scale = startScale * (d / startDist);
+      if (scale < 0.7) scale = 0.7;
+      if (scale > 2.5) scale = 2.5;
+      clamp();
+      apply();
+    }
+  }, { passive: false });
+
+  world.addEventListener('touchend', function(e) {
+    if (e.touches.length === 0) { dragging = false; pinching = false; }
   });
 
-  world.addEventListener('touchend', function() { drag = false; });
+  function distance(a, b) {
+    var dx = a.clientX - b.clientX;
+    var dy = a.clientY - b.clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+
+  function clamp() {
+    var w = WORLD_W * scale;
+    var h = WORLD_H * scale;
+    var minX = -(w - window.innerWidth);
+    var minY = -(h - window.innerHeight);
+    if (posX > 0) posX = 0;
+    if (posX < minX) posX = minX;
+    if (posY > 0) posY = 0;
+    if (posY < minY) posY = minY;
+  }
+
+  function apply() {
+    world.style.transform = 'translate(' + posX + 'px, ' + posY + 'px) scale(' + scale + ')';
+    world.style.transformOrigin = '0 0';
+  }
 }
 </script>
 
