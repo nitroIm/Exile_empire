@@ -166,11 +166,16 @@ function initMap() {
       touchStartY = e.touches[0].clientY;
       moved = false;
     } else if (e.touches.length === 2) {
-      dragging = false;
-      pinching = true;
-      startDist = distance(e.touches[0], e.touches[1]);
-      startScale = scale;
-    }
+  dragging = false;
+  pinching = true;
+  startDist = distance(e.touches[0], e.touches[1]);
+  startScale = scale;
+  // Запоминаем центр щипка
+  pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+  pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+  pinchStartPosX = posX;
+  pinchStartPosY = posY;
+}
   }, { passive: false });
 
   game.addEventListener('touchmove', function(e) {
