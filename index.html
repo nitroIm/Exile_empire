@@ -62,23 +62,8 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 </div>
 </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// ВСТАВЬ СВОИ КЛЮЧИ ИЗ FIREBASE ЗДЕСЬ
-const firebaseConfig = {
-  apiKey: "AIzaSy...",
-  authDomain: "exile-empire.firebaseapp.com",
-  projectId: "exile-empire",
-  storageBucket: "exile-empire.appspot.com",
-  messagingSenderId: "...",
-  appId: "..."
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
+<!-- UI ЛОГИКА (работает всегда) -->
+<script>
 var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
@@ -87,30 +72,10 @@ setTimeout(function() {
   document.getElementById('menu').className = 'visible';
 }, 4000);
 
-window.startGame = async function() {
+window.startGame = function() {
   document.getElementById('menu').className = '';
   document.getElementById('game').className = 'visible';
   initMapDrag();
-
-  // Загрузка данных игрока из Firebase
-  try {
-    const playerId = 'test_user_1';
-    const docRef = doc(db, 'players', playerId);
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      const data = snap.data();
-      document.getElementById('metal').textContent = data.metal || 0;
-      document.getElementById('crystal').textContent = data.crystal || 0;
-      document.getElementById('stars').textContent = data.stars || 0;
-    } else {
-      await setDoc(docRef, { metal: 500, crystal: 200, stars: 0 });
-      document.getElementById('metal').textContent = 500;
-      document.getElementById('crystal').textContent = 200;
-      document.getElementById('stars').textContent = 0;
-    }
-  } catch (e) {
-    console.log('Firebase error:', e);
-  }
 };
 
 function initMapDrag() {
@@ -142,5 +107,44 @@ function initMapDrag() {
   world.addEventListener('touchend', function() { drag = false; });
 }
 </script>
+
+<!-- FIREBASE (отдельно, если упадёт — игра всё равно работает) -->
+<script type="module">
+try {
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+  const { getFirestore, doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+  const firebaseConfig = {
+    apiKey: "ВСТАВЬ",
+    authDomain: "ВСТАВЬ",
+    projectId: "ВСТАВЬ",
+    storageBucket: "ВСТАВЬ",
+    messagingSenderId: "ВСТАВЬ",
+    appId: "ВСТАВЬ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.loadPlayer = async function() {
+    const docRef = doc(db, 'players', 'test_user_1');
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      const d = snap.data();
+      document.getElementById('metal').textContent = d.metal || 0;
+      document.getElementById('crystal').textContent = d.crystal || 0;
+      document.getElementById('stars').textContent = d.stars || 0;
+    } else {
+      await setDoc(docRef, { metal: 500, crystal: 200, stars: 0 });
+      document.getElementById('metal').textContent = 500;
+      document.getElementById('crystal').textContent = 200;
+      document.getElementById('stars').textContent = 0;
+    }
+  };
+} catch(e) {
+  console.log('Firebase fail:', e);
+}
+</script>
+
 </body>
 </html>
