@@ -5,217 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Exile Empire</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; color: #fff; height: 100vh; width: 100vw; }
-#splash { position: fixed; top:0; left:0; right:0; bottom:0; z-index: 100; }
-#splash.hidden { display: none; }
-#splash img { width: 100%; height: 100%; object-fit: cover; }
-#menu { position: fixed; top:0; left:0; right:0; bottom:0; display: none; }
-#menu.visible { display: block; }
-#menu img.bg { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; }
-#menu .dark { position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); }
-#menu .buttons { position: absolute; bottom: 50px; left: 0; right: 0; padding: 0 30px; }
-.menu-btn { width: 100%; padding: 18px; margin-bottom: 14px; font-size: 16px; font-weight: bold; color: #fff; background: #0a1430; border: 2px solid #00e0d0; border-radius: 14px; text-align: center; }
-.menu-btn.gold { border-color: #d4a020; }
-#game { position: fixed; top:0; left:0; right:0; bottom:0; display: none; overflow: hidden; touch-action: none; }
-#game.visible { display: block; }
-#world { position: absolute; top:0; left:0; touch-action: none; user-select: none; }
-#world img { display: block; width: 1024px; height: 1024px; position: absolute; }
-#resources { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; padding: 15px; background: rgba(10,14,26,0.85); font-size: 14px; z-index: 10; }
-#bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; padding: 12px; background: rgba(10,14,26,0.85); z-index: 10; }
-.bottom-btn { flex: 1; padding: 14px 8px; margin: 0 4px; font-size: 12px; color: #fff; text-align: center; background: #0a1430; border: 2px solid #00e0d0; border-radius: 12px; }
-.bottom-btn.gold { border-color: #d4a020; }
-</style>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div id="splash">
-<img src="assets/splash.PNG" alt="splash">
+  <img src="assets/splash.PNG" alt="splash">
 </div>
 
 <div id="menu">
-<img class="bg" src="assets/Planet.PNG" alt="bg">
-<div class="dark"></div>
-<div class="buttons">
-<div class="menu-btn gold" onclick="startGame()">PLAY</div>
-<div class="menu-btn">PROFILE</div>
-<div class="menu-btn">SHOP</div>
-<div class="menu-btn">SETTINGS</div>
-</div>
+  <img class="bg" src="assets/Planet.PNG" alt="bg">
+  <div class="dark"></div>
+  <div class="buttons">
+    <div class="menu-btn gold" onclick="startGame()">PLAY</div>
+    <div class="menu-btn">PROFILE</div>
+    <div class="menu-btn">SHOP</div>
+    <div class="menu-btn">SETTINGS</div>
+  </div>
 </div>
 
 <div id="game">
-<div id="world"></div>
-<div id="resources">
-<span>METAL <span id="metal">0</span></span>
-<span>CRYSTAL <span id="crystal">0</span></span>
-<span>STARS <span id="stars">0</span></span>
+  <div id="world"></div>
+  <div id="resources">
+    <span>METAL <span id="metal">0</span></span>
+    <span>CRYSTAL <span id="crystal">0</span></span>
+    <span>STARS <span id="stars">0</span></span>
+  </div>
+  <div id="bottom-bar">
+    <div class="bottom-btn gold">BUILD</div>
+    <div class="bottom-btn">FIGHT</div>
+    <div class="bottom-btn">SCIENCE</div>
+    <div class="bottom-btn">FLEET</div>
+  </div>
 </div>
-<div id="bottom-bar">
-<div class="bottom-btn gold">BUILD</div>
-<div class="bottom-btn">FIGHT</div>
-<div class="bottom-btn">SCIENCE</div>
-<div class="bottom-btn">FLEET</div>
-</div>
-</div>
 
-<script>
-// ============ КАРТЫ ============
-// Имена файлов точно как в папке maps/
-var MAPS = [
-  { file: "maps/map_01.PNG", col: 0, row: 0 },
-  { file: "maps/map_2.PNG", col: 1, row: 0 },
-  { file: "maps/map_3.PNG", col: 0, row: 1 },
-  { file: "maps/map_4.PNG", col: 1, row: 1 }
-];
-
-var TILE = 1024;
-var WORLD_W = 2048;
-var WORLD_H = 2048;
-
-// ============ СБОРКА МИРА ============
-(function buildWorld() {
-  var world = document.getElementById('world');
-  world.style.width = WORLD_W + 'px';
-  world.style.height = WORLD_H + 'px';
-  MAPS.forEach(function(m) {
-    var img = document.createElement('img');
-    img.src = m.file;
-    img.style.left = (m.col * TILE) + 'px';
-    img.style.top = (m.row * TILE) + 'px';
-    world.appendChild(img);
-  });
-})();
-
-// ============ TELEGRAM ============
-var tg = window.Telegram ? window.Telegram.WebApp : null;
-if (tg) { tg.ready(); tg.expand(); }
-
-setTimeout(function() {
-  document.getElementById('splash').className = 'hidden';
-  document.getElementById('menu').className = 'visible';
-}, 7000);
-
-window.startGame = function() {
-  document.getElementById('menu').className = '';
-  document.getElementById('game').className = 'visible';
-  initMap();
-  if (window.loadPlayer) window.loadPlayer();
-};
-
-// ============ СВАЙП + ЗУМ ============
-function initMap() {
-  var world = document.getElementById('world');
-  var game = document.getElementById('game');
-  var posX = 0, posY = 0, scale = 1;
-
-  posX = -(WORLD_W - window.innerWidth) / 2;
-  posY = -(WORLD_H - window.innerHeight) / 2;
-  apply();
-
-  var startX = 0, startY = 0;
-  var startDist = 0, startScale = 1;
-  var dragging = false, pinching = false;
-
-  game.addEventListener('touchstart', function(e) {
-    if (e.touches.length === 1) {
-      dragging = true;
-      startX = e.touches[0].clientX - posX;
-      startY = e.touches[0].clientY - posY;
-    } else if (e.touches.length === 2) {
-      dragging = false;
-      pinching = true;
-      startDist = distance(e.touches[0], e.touches[1]);
-      startScale = scale;
-    }
-  }, { passive: false });
-
-  game.addEventListener('touchmove', function(e) {
-    e.preventDefault();
-    if (dragging && e.touches.length === 1) {
-      posX = e.touches[0].clientX - startX;
-      posY = e.touches[0].clientY - startY;
-      clamp();
-      apply();
-    } else if (pinching && e.touches.length === 2) {
-      var d = distance(e.touches[0], e.touches[1]);
-      scale = startScale * (d / startDist);
-      if (scale < 0.7) scale = 0.7;
-      if (scale > 3) scale = 3;
-      clamp();
-      apply();
-    }
-  }, { passive: false });
-
-  game.addEventListener('touchend', function(e) {
-    if (e.touches.length === 0) { dragging = false; pinching = false; }
-  });
-
-  function distance(a, b) {
-    var dx = a.clientX - b.clientX;
-    var dy = a.clientY - b.clientY;
-    return Math.sqrt(dx*dx + dy*dy);
-  }
-
-  function clamp() {
-    var w = WORLD_W * scale;
-    var h = WORLD_H * scale;
-    var minX = -(w - window.innerWidth);
-    var minY = -(h - window.innerHeight);
-    if (posX > 0) posX = 0;
-    if (posX < minX) posX = minX;
-    if (posY > 0) posY = 0;
-    if (posY < minY) posY = minY;
-  }
-
-  function apply() {
-    world.style.transformOrigin = '0 0';
-    world.style.transform = 'translate(' + posX + 'px, ' + posY + 'px) scale(' + scale + ')';
-  }
-}
-</script>
-
-<script type="module">
-try {
-  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-  const { getFirestore, doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAaAMt8O1pNfF7O2TJkWSyyvv6Ndp5XHfU",
-    authDomain: "exile-empire.firebaseapp.com",
-    projectId: "exile-empire",
-    storageBucket: "exile-empire.firebasestorage.app",
-    messagingSenderId: "465765692374",
-    appId: "1:465765692374:web:c6b984f3ba91ecc22c2a77"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.loadPlayer = async function() {
-    try {
-      const docRef = doc(db, 'players', 'test_user_1');
-      const snap = await getDoc(docRef);
-      if (snap.exists()) {
-        const d = snap.data();
-        document.getElementById('metal').textContent = d.metal || 0;
-        document.getElementById('crystal').textContent = d.crystal || 0;
-        document.getElementById('stars').textContent = d.stars || 0;
-      } else {
-        await setDoc(docRef, { metal: 500, crystal: 200, stars: 0 });
-        document.getElementById('metal').textContent = 500;
-        document.getElementById('crystal').textContent = 200;
-        document.getElementById('stars').textContent = 0;
-      }
-    } catch(e) {
-      console.log('Firebase error:', e);
-    }
-  };
-} catch(e) {
-  console.log('Firebase init error:', e);
-}
-</script>
-
+<script src="js/game.js"></script>
+<script type="module" src="js/firebase.js"></script>
 </body>
 </html>
