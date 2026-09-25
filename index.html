@@ -20,7 +20,7 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 .menu-btn.gold { border-color: #d4a020; }
 #game { position: fixed; top:0; left:0; right:0; bottom:0; display: none; overflow: hidden; }
 #game.visible { display: block; }
-#world { position: absolute; top:0; left:0; width: 4096px; height: 4096px; }
+#world { position: absolute; top:0; left:0; width: 1024px; height: 1024px; }
 #world img { width: 100%; height: 100%; display: block; }
 #resources { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-around; padding: 15px; background: rgba(10,14,26,0.85); font-size: 14px; z-index: 10; }
 #bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; padding: 12px; background: rgba(10,14,26,0.85); z-index: 10; }
@@ -47,7 +47,7 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 
 <div id="game">
 <div id="world">
-<img src="assets/map_01.PNG" alt="map">
+<img src="assets/maps/map_01.PNG" alt="map">
 </div>
 <div id="resources">
 <span>METAL 0</span>
@@ -81,8 +81,8 @@ function initMapDrag() {
   var world = document.getElementById('world');
   var startX = 0, startY = 0, worldX = 0, worldY = 0, drag = false;
 
-  worldX = -(4096 - window.innerWidth) / 2;
-  worldY = -(4096 - window.innerHeight) / 2;
+  worldX = -(1024 - window.innerWidth) / 2;
+  worldY = -(1024 - window.innerHeight) / 2;
   world.style.transform = 'translate(' + worldX + 'px, ' + worldY + 'px)';
 
   world.addEventListener('touchstart', function(e) {
@@ -97,9 +97,9 @@ function initMapDrag() {
     worldX = e.touches[0].clientX - startX;
     worldY = e.touches[0].clientY - startY;
     if (worldX > 0) worldX = 0;
-    if (worldX < -(4096 - window.innerWidth)) worldX = -(4096 - window.innerWidth);
+    if (worldX < -(1024 - window.innerWidth)) worldX = -(1024 - window.innerWidth);
     if (worldY > 0) worldY = 0;
-    if (worldY < -(4096 - window.innerHeight)) worldY = -(4096 - window.innerHeight);
+    if (worldY < -(1024 - window.innerHeight)) worldY = -(1024 - window.innerHeight);
     world.style.transform = 'translate(' + worldX + 'px, ' + worldY + 'px)';
   });
 
