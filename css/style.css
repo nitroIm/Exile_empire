@@ -1,0 +1,93 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0e1a;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ===== ЗАСТАВКА ===== */
+#splash {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 100;
+}
+#splash.hidden { display: none; }
+#splash img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ===== МЕНЮ ===== */
+#menu {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+}
+#menu.visible { display: block; }
+#menu img.bg {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+#menu .dark {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+#menu .buttons {
+  position: absolute; bottom: 50px;
+  left: 0; right: 0;
+  padding: 0 30px;
+}
+.menu-btn {
+  width: 100%; padding: 18px; margin-bottom: 14px;
+  font-size: 16px; font-weight: bold; color: #fff;
+  background: #0a1430;
+  border: 2px solid #00e0d0;
+  border-radius: 14px;
+  text-align: center;
+}
+.menu-btn.gold { border-color: #d4a020; }
+
+/* ===== ИГРА ===== */
+#game {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  overflow: hidden;
+  touch-action: none;
+}
+#game.visible { display: block; }
+
+#world {
+  position: absolute; top: 0; left: 0;
+  touch-action: none;
+  user-select: none;
+}
+#world img {
+  display: block;
+  width: 1024px;
+  height: 1024px;
+  position: absolute;
+}
+
+#resources {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-around;
+  padding: 15px;
+  background: rgba(10, 14, 26, 0.85);
+  font-size: 14px;
+  z-index: 10;
+}
+
+#bottom-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex;
+  padding: 12px;
+  background: rgba(10, 14, 26, 0.85);
+  z-index: 10;
+}
+.bottom-btn {
+  flex: 1; padding: 14px 8px; margin: 0 4px;
+  font-size: 12px; color: #fff; text-align: center;
+  background: #0a1430;
+  border: 2px solid #00e0d0;
+  border-radius: 12px;
+}
+.bottom-btn.gold { border-color: #d4a020; }
