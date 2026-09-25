@@ -17,15 +17,17 @@ var WORLD_H = 2048;
 // ============================================
 // ПЕРСОНАЖ (адмирал)
 // ============================================
-var HERO_SIZE = 128;      // размер на карте
-var HERO_SPEED = 4;       // скорость (px за кадр)
-var HERO_FRAME_TIME = 8;  // каждые N кадров менять спрайт
+var HERO_SIZE = 128;
+var HERO_SPEED = 4;
+var HERO_FRAME_TIME = 8;
 
+// Пока есть только up_1 и up_2 — они используются для всех направлений.
+// Когда загрузишь down/left/right — просто замени пути ниже.
 var HERO_FRAMES = {
-  up:    ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG']
-  // down:  ['characters/hero/down_1.PNG', 'characters/hero/down_2.PNG'],
-  // left:  ['characters/hero/left_1.PNG', 'characters/hero/left_2.PNG'],
-  // right: ['characters/hero/right_1.PNG', 'characters/hero/right_2.PNG']
+  up:    ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG'],
+  down:  ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG'],
+  left:  ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG'],
+  right: ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG']
 };
 var HERO_IDLE = 'characters/hero/up_1.PNG';
 
@@ -35,7 +37,8 @@ var hero = {
   el: null,
   frameIndex: 0,
   frameCounter: 0,
-  moving: false
+  moving: false,
+  dir: 'up'
 };
 
 // ============ СБОРКА МИРА ============
@@ -54,7 +57,6 @@ var hero = {
     world.appendChild(img);
   });
 
-  // === Герой ===
   var heroEl = document.createElement('img');
   heroEl.src = HERO_IDLE;
   heroEl.style.position = 'absolute';
@@ -83,15 +85,21 @@ function heroLoop() {
       hero.el.style.left = hero.x + 'px';
       hero.el.style.top = hero.y + 'px';
 
+      // Определяем направление
+      if (Math.abs(dx) > Math.abs(dy)) {
+        hero.dir = dx > 0 ? 'right' : 'left';
+      } else {
+        hero.dir = dy > 0 ? 'down' : 'up';
+      }
+
       // Анимация ходьбы
       hero.frameCounter++;
       if (hero.frameCounter >= HERO_FRAME_TIME) {
         hero.frameCounter = 0;
-        hero.frameIndex = (hero.frameIndex + 1) % HERO_FRAMES.up.length;
-        hero.el.src = HERO_FRAMES.up[hero.frameIndex];
+        hero.frameIndex = (hero.frameIndex + 1) % HERO_FRAMES[hero.dir].length;
+        hero.el.src = HERO_FRAMES[hero.dir][hero.frameIndex];
       }
     } else {
-      // Дошёл — стоп
       hero.x = hero.targetX;
       hero.y = hero.targetY;
       hero.el.style.left = hero.x + 'px';
@@ -111,7 +119,6 @@ function heroMoveTo(clientX, clientY) {
   var x = (clientX - rect.left) * scaleX;
   var y = (clientY - rect.top) * scaleY;
 
-  // Ограничение по краям
   if (x < HERO_SIZE/2) x = HERO_SIZE/2;
   if (x > WORLD_W - HERO_SIZE/2) x = WORLD_W - HERO_SIZE/2;
   if (y < HERO_SIZE/2) y = HERO_SIZE/2;
@@ -156,6 +163,10 @@ function initMap() {
   var touchStartX = 0, touchStartY = 0;
   var moved = false;
 
+  // Переменные для зума относительно центра щипка
+  var pinchCenterX = 0, pinchCenterY = 0;
+  var pinchStartPosX = 0, pinchStartPosY = 0;
+
   game.addEventListener('touchstart', function(e) {
     if (e.touches.length === 1) {
       dragging = true;
@@ -166,16 +177,15 @@ function initMap() {
       touchStartY = e.touches[0].clientY;
       moved = false;
     } else if (e.touches.length === 2) {
-  dragging = false;
-  pinching = true;
-  startDist = distance(e.touches[0], e.touches[1]);
-  startScale = scale;
-  // Запоминаем центр щипка
-  pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-  pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-  pinchStartPosX = posX;
-  pinchStartPosY = posY;
-}
+      dragging = false;
+      pinching = true;
+      startDist = distance(e.touches[0], e.touches[1]);
+      startScale = scale;
+      pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      pinchStartPosX = posX;
+      pinchStartPosY = posY;
+    }
   }, { passive: false });
 
   game.addEventListener('touchmove', function(e) {
@@ -183,7 +193,6 @@ function initMap() {
     if (dragging && e.touches.length === 1) {
       posX = e.touches[0].clientX - startX;
       posY = e.touches[0].clientY - startY;
-      // Если сильно сдвинул — это свайп, не тап
       if (Math.abs(e.touches[0].clientX - touchStartX) > 10 ||
           Math.abs(e.touches[0].clientY - touchStartY) > 10) {
         moved = true;
@@ -192,9 +201,19 @@ function initMap() {
       apply();
     } else if (pinching && e.touches.length === 2) {
       var d = distance(e.touches[0], e.touches[1]);
-      scale = startScale * (d / startDist);
-      if (scale < 0.7) scale = 0.7;
-      if (scale > 3) scale = 3;
+      var newScale = startScale * (d / startDist);
+      if (newScale < 0.7) newScale = 0.7;
+      if (newScale > 3) newScale = 3;
+
+      // Точка мира, которая под центром щипка (до зума)
+      var worldX_at_center = (pinchCenterX - pinchStartPosX) / startScale;
+      var worldY_at_center = (pinchCenterY - pinchStartPosY) / startScale;
+
+      // После зума эта точка должна остаться на месте
+      posX = pinchCenterX - worldX_at_center * newScale;
+      posY = pinchCenterY - worldY_at_center * newScale;
+
+      scale = newScale;
       clamp();
       apply();
     }
@@ -204,7 +223,6 @@ function initMap() {
     if (e.touches.length === 0) {
       dragging = false;
       pinching = false;
-      // Тап, а не свайп → двигаем героя
       if (!moved && Date.now() - touchStartTime < 300) {
         heroMoveTo(touchStartX, touchStartY);
       }
