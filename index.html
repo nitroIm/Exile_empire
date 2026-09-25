@@ -31,11 +31,11 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 <body>
 
 <div id="splash">
-<img src="https://nitroIm.github.io/Exile_empire/assets/splash.PNG" alt="splash">
+<img src="https://nitroim.github.io/Exile_empire/assets/splash.PNG" alt="splash">
 </div>
 
 <div id="menu">
-<img class="bg" src="https://nitroIm.github.io/Exile_empire/assets/Planet.PNG" alt="bg">
+<img class="bg" src="https://nitroim.github.io/Exile_empire/assets/Planet.PNG" alt="bg">
 <div class="dark"></div>
 <div class="buttons">
 <div class="menu-btn gold" onclick="startGame()">PLAY</div>
@@ -47,7 +47,7 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 
 <div id="game">
 <div id="world">
-<img src="https://nitroIm.github.io/Exile_empire/maps/map_01.PNG" alt="map">
+<img src="https://nitroim.github.io/Exile_empire/maps/map_01.PNG" alt="map">
 </div>
 <div id="resources">
 <span>METAL <span id="metal">0</span></span>
@@ -62,7 +62,6 @@ body { background: #0a0e1a; overflow: hidden; font-family: Arial, sans-serif; co
 </div>
 </div>
 
-<!-- UI ЛОГИКА (работает всегда) -->
 <script>
 var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
@@ -105,44 +104,6 @@ function initMapDrag() {
   });
 
   world.addEventListener('touchend', function() { drag = false; });
-}
-</script>
-
-<!-- FIREBASE (отдельно, если упадёт — игра всё равно работает) -->
-<script type="module">
-try {
-  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-  const { getFirestore, doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-
-  const firebaseConfig = {
-    apiKey: "ВСТАВЬ",
-    authDomain: "ВСТАВЬ",
-    projectId: "ВСТАВЬ",
-    storageBucket: "ВСТАВЬ",
-    messagingSenderId: "ВСТАВЬ",
-    appId: "ВСТАВЬ"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  window.loadPlayer = async function() {
-    const docRef = doc(db, 'players', 'test_user_1');
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      const d = snap.data();
-      document.getElementById('metal').textContent = d.metal || 0;
-      document.getElementById('crystal').textContent = d.crystal || 0;
-      document.getElementById('stars').textContent = d.stars || 0;
-    } else {
-      await setDoc(docRef, { metal: 500, crystal: 200, stars: 0 });
-      document.getElementById('metal').textContent = 500;
-      document.getElementById('crystal').textContent = 200;
-      document.getElementById('stars').textContent = 0;
-    }
-  };
-} catch(e) {
-  console.log('Firebase fail:', e);
 }
 </script>
 
