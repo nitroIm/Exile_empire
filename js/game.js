@@ -24,10 +24,10 @@ var HERO_FRAME_TIME = 8;
 // Пока есть только up_1 и up_2 — они используются для всех направлений.
 // Когда загрузишь down/left/right — просто замени пути ниже.
 var HERO_FRAMES = {
-  up:    ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG'],
-  down:  ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG'],
-  left:  ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG'],
-  right: ['characters/hero/up_1.PNG', 'characters/hero/up_2.PNG']
+  up:    ['characters/hero/up_1.PNG',   'characters/hero/up_2.PNG'],
+  down:  ['characters/hero/down_1.PNG', 'characters/hero/down_2.PNG'],
+  left:  ['characters/hero/up_1.PNG',   'characters/hero/up_2.PNG'],
+  right: ['characters/hero/up_1.PNG',   'characters/hero/up_2.PNG']
 };
 var HERO_IDLE = 'characters/hero/up_1.PNG';
 
