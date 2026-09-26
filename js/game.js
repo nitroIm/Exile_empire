@@ -29,7 +29,7 @@ var HERO_FRAMES = {
   left:  ['characters/hero/left_1.PNG', 'characters/hero/left_2.PNG'],
   right: ['characters/hero/left_1.PNG', 'characters/hero/left_2.PNG']
 };
-var HERO_IDLE = 'characters/hero/up_1.PNG';
+var HERO_IDLE = 'characters/hero/left_1.PNG';
 var hero = {
   x: 1024, y: 1024,
   targetX: 1024, targetY: 1024,
