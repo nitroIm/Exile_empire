@@ -68,7 +68,7 @@ body {
   pointer-events: none;
 }
 
-/* ===== ПРОФИЛЬ (маленький, в углу) ===== */
+/* ===== ПРОФИЛЬ ===== */
 #profile {
   position: relative;
   width: 110px;
@@ -95,6 +95,7 @@ body {
   letter-spacing: 0.3px;
   text-shadow: 0 0 3px rgba(0,0,0,0.9);
 }
+
 #avatar {
   position: absolute;
   top: 24px;
@@ -106,7 +107,6 @@ body {
   border: 2px solid #d4a020;
   border-radius: 50%;
 }
-
 
 #player-rank {
   position: absolute;
