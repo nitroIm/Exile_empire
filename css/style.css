@@ -97,7 +97,7 @@ body {
 }
 #avatar {
   position: absolute;
-  top: 30px;
+  top: 24px;
   left: 50%;
   transform: translateX(-50%);
   width: 70px;
