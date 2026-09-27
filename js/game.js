@@ -1,7 +1,5 @@
 // ============================================
-// КАРТЫ — добавляй новые здесь
-// col: 0 = левая, 1 = правая
-// row: 0 = верх,  1 = низ
+// КАРТЫ
 // ============================================
 var MAPS = [
   { file: "maps/map_01.PNG", col: 0, row: 0 },
@@ -15,21 +13,20 @@ var WORLD_W = 2048;
 var WORLD_H = 2048;
 
 // ============================================
-// ПЕРСОНАЖ (адмирал)
+// ПЕРСОНАЖ
 // ============================================
 var HERO_SIZE = 128;
 var HERO_SPEED = 4;
 var HERO_FRAME_TIME = 8;
 
-// Пока есть только up_1 и up_2 — они используются для всех направлений.
-// Когда загрузишь down/left/right — просто замени пути ниже.
 var HERO_FRAMES = {
   up:    ['characters/hero/up_1.PNG',    'characters/hero/up_2.PNG'],
   down:  ['characters/hero/down_1.PNG',  'characters/hero/down_2.PNG'],
   left:  ['characters/hero/left_1.PNG',  'characters/hero/left_2.PNG'],
-  right: ['characters/hero/right_1.PNG', 'characters/hero/right_2.PNG']
+  right: ['characters/hero/left_1.PNG',  'characters/hero/left_2.PNG']
 };
-var HERO_IDLE = 'characters/hero/left_1.PNG';
+var HERO_IDLE = 'characters/hero/up_1.PNG';
+
 var hero = {
   x: 1024, y: 1024,
   targetX: 1024, targetY: 1024,
@@ -84,19 +81,23 @@ function heroLoop() {
       hero.el.style.left = hero.x + 'px';
       hero.el.style.top = hero.y + 'px';
 
-      // Определяем направление
       if (Math.abs(dx) > Math.abs(dy)) {
         hero.dir = dx > 0 ? 'right' : 'left';
       } else {
         hero.dir = dy > 0 ? 'down' : 'up';
       }
 
-      // Анимация ходьбы
       hero.frameCounter++;
       if (hero.frameCounter >= HERO_FRAME_TIME) {
         hero.frameCounter = 0;
         hero.frameIndex = (hero.frameIndex + 1) % HERO_FRAMES[hero.dir].length;
         hero.el.src = HERO_FRAMES[hero.dir][hero.frameIndex];
+      }
+
+      if (hero.dir === 'right') {
+        hero.el.style.transform = 'scaleX(-1)';
+      } else {
+        hero.el.style.transform = 'scaleX(1)';
       }
     } else {
       hero.x = hero.targetX;
@@ -105,6 +106,7 @@ function heroLoop() {
       hero.el.style.top = hero.y + 'px';
       hero.moving = false;
       hero.el.src = HERO_IDLE;
+      hero.el.style.transform = 'scaleX(1)';
     }
   }
   requestAnimationFrame(heroLoop);
@@ -161,8 +163,6 @@ function initMap() {
   var touchStartTime = 0;
   var touchStartX = 0, touchStartY = 0;
   var moved = false;
-
-  // Переменные для зума относительно центра щипка
   var pinchCenterX = 0, pinchCenterY = 0;
   var pinchStartPosX = 0, pinchStartPosY = 0;
 
@@ -204,11 +204,9 @@ function initMap() {
       if (newScale < 0.7) newScale = 0.7;
       if (newScale > 3) newScale = 3;
 
-      // Точка мира, которая под центром щипка (до зума)
       var worldX_at_center = (pinchCenterX - pinchStartPosX) / startScale;
       var worldY_at_center = (pinchCenterY - pinchStartPosY) / startScale;
 
-      // После зума эта точка должна остаться на месте
       posX = pinchCenterX - worldX_at_center * newScale;
       posY = pinchCenterY - worldY_at_center * newScale;
 
@@ -250,3 +248,41 @@ function initMap() {
     world.style.transform = 'translate(' + posX + 'px, ' + posY + 'px) scale(' + scale + ')';
   }
 }
+
+// ============================================
+// ВЫДВИЖНАЯ ПАНЕЛЬ
+// ============================================
+(function initPanel() {
+  var bar = document.getElementById('bottom-bar');
+  var handle = document.getElementById('panel-handle');
+
+  handle.addEventListener('click', function() {
+    bar.classList.toggle('expanded');
+    if (tg) tg.HapticFeedback?.impactOccurred('light');
+  });
+
+  var startY = 0;
+  handle.addEventListener('touchstart', function(e) {
+    startY = e.touches[0].clientY;
+  });
+  handle.addEventListener('touchend', function(e) {
+    var endY = e.changedTouches[0].clientY;
+    var diff = startY - endY;
+    if (diff > 30) bar.classList.add('expanded');
+    if (diff < -30) bar.classList.remove('expanded');
+  });
+})();
+
+// ============================================
+// ЗАГЛУШКИ ДЛЯ КНОПОК
+// ============================================
+window.openBase    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('База'); };
+window.openMine    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Рудник'); };
+window.openFight   = function() { if (tg) tg.HapticFeedback?.impactOccurred('medium'); alert('Бой'); };
+window.openMap     = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Карта'); };
+window.openShop    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Магазин'); };
+window.openArmy    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Армия'); };
+window.openScience = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Наука'); };
+window.openFleet   = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Флот'); };
+window.openClan    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Клан'); };
+window.openQuests  = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Задания'); };
