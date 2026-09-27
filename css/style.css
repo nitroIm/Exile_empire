@@ -220,6 +220,13 @@ body {
   transition: all 0.2s;
 }
 
+/* Средние 3 кнопки (2, 3, 4) — опустить ниже */
+.bottom-btn:nth-child(2),
+.bottom-btn:nth-child(3),
+.bottom-btn:nth-child(4) {
+  margin-top: 14px;
+}
+
 .bottom-btn img {
   width: 44px; height: 44px;
   display: block; margin-bottom: 2px;
@@ -231,7 +238,7 @@ body {
   text-align: center;
 }
 
-/* БОЛЬШАЯ КНОПКА — теперь такая же, как остальные */
+/* БОЙ — такая же, как остальные */
 .bottom-btn.big img { width: 44px; height: 44px; }
 .bottom-btn.big span { font-size: 10px; color: #fff; }
 .bottom-btn.big {
