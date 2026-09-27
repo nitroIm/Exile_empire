@@ -110,11 +110,29 @@ body {
 
 #player-rank {
   position: absolute;
-  bottom: 18px;
+  top: 100px;
   left: 0; right: 0;
   text-align: center;
-  font-size: 9px;
-  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  color: #d4a020;
+  letter-spacing: 0.3px;
+  text-shadow: 0 0 3px rgba(0,0,0,0.9);
+}
+
+#player-rank-icons {
+  position: absolute;
+  top: 118px;
+  left: 0; right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  height: 20px;
+}
+
+#player-rank-icons img {
+  width: 16px;
+  height: 16px;
 }
 
 /* ===== РЕСУРСЫ ===== */
