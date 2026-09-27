@@ -218,13 +218,14 @@ body {
   border-radius: 12px;
   background: transparent;
   transition: all 0.2s;
+  transform: translateY(0);
 }
 
-/* Средние 3 кнопки (2, 3, 4) — опустить ниже */
-.bottom-btn:nth-child(2),
-.bottom-btn:nth-child(3),
-.bottom-btn:nth-child(4) {
-  margin-top: 14px;
+/* Средние 3 кнопки (РУДНИК, БОЙ, КАРТА) — опустить ниже */
+#main-row .bottom-btn:nth-child(2),
+#main-row .bottom-btn:nth-child(3),
+#main-row .bottom-btn:nth-child(4) {
+  transform: translateY(14px);
 }
 
 .bottom-btn img {
