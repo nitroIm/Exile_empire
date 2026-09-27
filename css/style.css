@@ -86,7 +86,7 @@ body {
 
 #player-name {
   position: absolute;
-  top: 14px;
+  top: 22px;
   left: 0; right: 0;
   text-align: center;
   font-size: 9px;
@@ -98,7 +98,7 @@ body {
 
 #player-rank {
   position: absolute;
-  top: 100px;
+  top: 105px;
   left: 0; right: 0;
   text-align: center;
   font-size: 10px;
