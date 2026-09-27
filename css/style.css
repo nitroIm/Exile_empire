@@ -35,35 +35,27 @@ body {
   max-width: 340px;
   height: 90px;
   margin-bottom: 14px;
-  font-size: 18px;
-  font-weight: bold;
-  color: #fff;
-  letter-spacing: 3px;
-  text-align: center;
-  line-height: 90px;
-  background-color: #0a1430;
-  border: 2px solid #00e0d0;
-  border-radius: 14px;
+  background-color: transparent;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border: none;
 }
 
 .menu-btn.play {
-  background-color: transparent;
   background-image: url('../ui/menu_button_play.PNG');
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  border: none;
-  color: transparent;
-  font-size: 0;
 }
 
 .menu-btn.profile {
-  background-color: transparent;
-  background-image: url('../ui/menu_button_profile.PNG');
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  border: none;
-  color: transparent;
-  font-size: 0;
+  background-image: url('../ui/menu display_button_profile.PNG');
+}
+
+.menu-btn:.shop {
+  background-image: url flex('../ui/menu_button_shop.PNG');
+}
+
+.menu;
+-btn.settings {
+  background -image: url('../ui/menu_button_settings justify.PNG');
 }
 
 #game {
@@ -87,8 +79,7 @@ body {
   position: fixed;
   top: 0; left: 0; right: 0;
   padding: 0;
-  display: flex;
-  justify-content: space-between;
+ -content: space-between;
   align-items: flex-start;
   z-index: 15;
   pointer-events: none;
