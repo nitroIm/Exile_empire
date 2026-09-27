@@ -27,16 +27,38 @@ body {
 #menu .buttons {
   position: absolute; bottom: 50px;
   left: 0; right: 0; padding: 0 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
+
+/* Обычная кнопка (PROFILE, SHOP, SETTINGS) */
 .menu-btn {
-  width: 100%; padding: 18px; margin-bottom: 14px;
-  font-size: 16px; font-weight: bold; color: #fff;
-  background: #0a1430;
+  width: 100%;
+  max-width: 340px;
+  height: 90px;
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 3px;
+  text-align: center;
+  line-height: 90px;
+  background-color: #0a1430;
   border: 2px solid #00e0d0;
   border-radius: 14px;
-  text-align: center;
 }
-.menu-btn.gold { border-color: #d4a020; }
+
+/* Кнопка PLAY — с картинкой */
+.menu-btn.gold {
+  background-color: transparent;
+  background-image: url('../ui/menu_button_play.PNG');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border: none;
+  color: #d4a020;
+  text-shadow: 0 0 8px rgba(0,0,0,0.9);
+}
 
 /* ===== ИГРА ===== */
 #game {
