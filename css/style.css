@@ -49,15 +49,16 @@ body {
   border-radius: 14px;
 }
 
-/* Кнопка PLAY — с картинкой */
+/* Кнопка PLAY — только картинка, HTML-текст спрятан */
 .menu-btn.gold {
   background-color: transparent;
   background-image: url('../ui/menu_button_play.PNG');
   background-size: 100% 100%;
   background-repeat: no-repeat;
   border: none;
-  color: #d4a020;
-  text-shadow: 0 0 8px rgba(0,0,0,0.9);
+  color: transparent;
+  font-size: 0;
+  text-shadow: none;
 }
 
 /* ===== ИГРА ===== */
@@ -243,7 +244,6 @@ body {
   transform: translateY(0);
 }
 
-/* Средние 3 кнопки (РУДНИК, БОЙ, КАРТА) — опустить ниже */
 #main-row .bottom-btn:nth-child(2),
 #main-row .bottom-btn:nth-child(3),
 #main-row .bottom-btn:nth-child(4) {
@@ -261,7 +261,6 @@ body {
   text-align: center;
 }
 
-/* БОЙ — такая же, как остальные */
 .bottom-btn.big img { width: 44px; height: 44px; }
 .bottom-btn.big span { font-size: 10px; color: #fff; }
 .bottom-btn.big {
