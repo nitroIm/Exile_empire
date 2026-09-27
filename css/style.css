@@ -9,32 +9,24 @@ body {
 }
 
 /* ===== ЗАСТАВКА ===== */
-#splash {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  z-index: 100;
-}
+#splash { position: fixed; top:0; left:0; right:0; bottom:0; z-index: 100; }
 #splash.hidden { display: none; }
 #splash img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ===== МЕНЮ ===== */
-#menu {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  display: none;
-}
+#menu { position: fixed; top:0; left:0; right:0; bottom:0; display: none; }
 #menu.visible { display: block; }
 #menu img.bg {
-  position: absolute; top: 0; left: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
+  position: absolute; top:0; left:0;
+  width: 100%; height: 100%; object-fit: cover;
 }
 #menu .dark {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  position: absolute; top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.5);
 }
 #menu .buttons {
   position: absolute; bottom: 50px;
-  left: 0; right: 0;
-  padding: 0 30px;
+  left: 0; right: 0; padding: 0 30px;
 }
 .menu-btn {
   width: 100%; padding: 18px; margin-bottom: 14px;
@@ -48,22 +40,19 @@ body {
 
 /* ===== ИГРА ===== */
 #game {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  display: none;
-  overflow: hidden;
+  position: fixed; top:0; left:0; right:0; bottom:0;
+  display: none; overflow: hidden;
   touch-action: none;
 }
 #game.visible { display: block; }
 
 #world {
-  position: absolute; top: 0; left: 0;
-  touch-action: none;
-  user-select: none;
+  position: absolute; top:0; left:0;
+  touch-action: none; user-select: none;
 }
 #world img {
   display: block;
-  width: 1024px;
-  height: 1024px;
+  width: 1024px; height: 1024px;
   position: absolute;
 }
 
@@ -76,18 +65,83 @@ body {
   z-index: 10;
 }
 
+/* ===== НИЖНЯЯ ПАНЕЛЬ (ВЫДВИЖНАЯ) ===== */
 #bottom-bar {
-  position: fixed; bottom: 0; left: 0; right: 0;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(10, 14, 26, 0.97);
+  border-top: 2px solid #00e0d0;
+  z-index: 20;
+  transition: transform 0.35s ease;
+  padding-bottom: 10px;
+  max-height: 75vh;
+}
+
+#panel-handle {
+  height: 24px;
   display: flex;
-  padding: 12px;
-  background: rgba(10, 14, 26, 0.85);
-  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
 }
+.handle-bar {
+  width: 50px; height: 4px;
+  background: #00e0d0;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+#extra-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 0 6px 4px;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.35s ease;
+}
+#bottom-bar.expanded #extra-row {
+  max-height: 90px;
+  opacity: 1;
+  margin-bottom: 4px;
+}
+
+#main-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding: 4px 6px 8px;
+}
+
 .bottom-btn {
-  flex: 1; padding: 14px 8px; margin: 0 4px;
-  font-size: 12px; color: #fff; text-align: center;
-  background: #0a1430;
-  border: 2px solid #00e0d0;
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 6px 4px; margin: 0 2px;
   border-radius: 12px;
+  background: transparent;
+  transition: all 0.2s;
 }
-.bottom-btn.gold { border-color: #d4a020; }
+
+.bottom-btn img {
+  width: 44px; height: 44px;
+  display: block; margin-bottom: 4px;
+}
+
+.bottom-btn span {
+  font-size: 10px; font-weight: bold;
+  color: #fff; letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.bottom-btn.big img { width: 60px; height: 60px; }
+.bottom-btn.big span { font-size: 11px; color: #d4a020; }
+.bottom-btn.big {
+  background: rgba(0, 224, 208, 0.1);
+  border: 1px solid rgba(0, 224, 208, 0.4);
+  margin-bottom: 6px;
+}
+
+.bottom-btn.active { background: rgba(0, 224, 208, 0.15); }
+.bottom-btn.active span { color: #d4a020; }
