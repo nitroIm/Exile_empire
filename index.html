@@ -9,10 +9,12 @@
 </head>
 <body>
 
+<!-- ЗАСТАВКА -->
 <div id="splash">
   <img src="assets/splash.PNG" alt="splash">
 </div>
 
+<!-- МЕНЮ -->
 <div id="menu">
   <img class="bg" src="assets/Planet.PNG" alt="bg">
   <div class="dark"></div>
@@ -24,15 +26,27 @@
   </div>
 </div>
 
+<!-- ИГРА -->
 <div id="game">
   <div id="world"></div>
 
-  <div id="resources">
-    <span>METAL <span id="metal">0</span></span>
-    <span>CRYSTAL <span id="crystal">0</span></span>
-    <span>STARS <span id="stars">0</span></span>
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ: ПРОФИЛЬ + РЕСУРСЫ -->
+  <div id="top-bar">
+    <div id="profile">
+      <img class="frame" src="ui/profile_frame.PNG" alt="">
+      <div id="player-name">АДМИРАЛ</div>
+      <img id="avatar" src="ui/avatar_default.PNG" alt="">
+      <div id="player-rank"></div>
+    </div>
+
+    <div id="resources">
+      <span>METAL <span id="metal">0</span></span>
+      <span>CRYSTAL <span id="crystal">0</span></span>
+      <span>STARS <span id="stars">0</span></span>
+    </div>
   </div>
 
+  <!-- НИЖНЯЯ ПАНЕЛЬ -->
   <div id="bottom-bar">
     <div id="panel-handle">
       <div class="handle-bar"></div>
