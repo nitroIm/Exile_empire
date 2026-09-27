@@ -86,10 +86,22 @@ body {
 
 #player-name {
   position: absolute;
-  top: 8px;
+  top: 14px;
   left: 0; right: 0;
   text-align: center;
   font-size: 9px;
+  font-weight: bold;
+  color: #d4a020;
+  letter-spacing: 0.3px;
+  text-shadow: 0 0 3px rgba(0,0,0,0.9);
+}
+
+#player-rank {
+  position: absolute;
+  top: 100px;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 10px;
   font-weight: bold;
   color: #d4a020;
   letter-spacing: 0.3px;
