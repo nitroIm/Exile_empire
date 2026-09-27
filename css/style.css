@@ -68,7 +68,7 @@ body {
   pointer-events: none;
 }
 
-/* ===== ПРОФИЛЬ (компактный) ===== */
+/* ===== ПРОФИЛЬ ===== */
 #profile {
   position: relative;
   width: 110px;
@@ -84,9 +84,10 @@ body {
   pointer-events: none;
 }
 
+/* 1. ИМЯ */
 #player-name {
   position: absolute;
-  top: 14px;
+  top: 16px;
   left: 0; right: 0;
   text-align: center;
   font-size: 9px;
@@ -96,18 +97,20 @@ body {
   text-shadow: 0 0 3px rgba(0,0,0,0.9);
 }
 
+/* 2. АВАТАР */
 #avatar {
   position: absolute;
-  top: 28px;
+  top: 32px;
   left: 50%;
   transform: translateX(-50%);
-  width: 62px;
-  height: 62px;
+  width: 58px;
+  height: 58px;
   object-fit: cover;
   border: 2px solid #d4a020;
   border-radius: 50%;
 }
 
+/* 3. ЗВАНИЕ */
 #player-rank {
   position: absolute;
   top: 96px;
@@ -120,6 +123,7 @@ body {
   text-shadow: 0 0 3px rgba(0,0,0,0.9);
 }
 
+/* 4. МЕСТО ПОД ЗНАЧКИ */
 #player-rank-icons {
   position: absolute;
   top: 112px;
