@@ -154,13 +154,13 @@ body {
 #bottom-bar {
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  background-color: rgba(10, 14, 26, 0.97);
+  background-color: transparent;
   background-image: url('../ui/panel_frame.PNG');
   background-size: 100% 100%;
   background-repeat: no-repeat;
   z-index: 20;
   transition: transform 0.35s ease;
-  padding: 30px 20px 20px 20px;
+  padding: 40px 25px 35px 25px;
   max-height: 75vh;
 }
 
@@ -189,7 +189,7 @@ body {
 #extra-row {
   display: flex;
   justify-content: space-around;
-  align-items: flex-end;
+  align-items: center;
   padding: 0 6px 4px;
   overflow: hidden;
   max-height: 0;
@@ -206,15 +206,15 @@ body {
 #main-row {
   display: flex;
   justify-content: space-around;
-  align-items: flex-end;
-  padding: 4px 6px 8px;
+  align-items: center;
+  padding: 0 6px 0 6px;
 }
 
 .bottom-btn {
   flex: 1;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: 6px 4px; margin: 0 2px;
+  padding: 4px 4px; margin: 0 2px;
   border-radius: 12px;
   background: transparent;
   transition: all 0.2s;
@@ -222,7 +222,7 @@ body {
 
 .bottom-btn img {
   width: 44px; height: 44px;
-  display: block; margin-bottom: 4px;
+  display: block; margin-bottom: 2px;
 }
 
 .bottom-btn span {
@@ -231,12 +231,13 @@ body {
   text-align: center;
 }
 
-.bottom-btn.big img { width: 60px; height: 60px; }
-.bottom-btn.big span { font-size: 11px; color: #d4a020; }
+/* БОЛЬШАЯ КНОПКА — теперь такая же, как остальные */
+.bottom-btn.big img { width: 44px; height: 44px; }
+.bottom-btn.big span { font-size: 10px; color: #fff; }
 .bottom-btn.big {
-  background: rgba(0, 224, 208, 0.1);
-  border: 1px solid rgba(0, 224, 208, 0.4);
-  margin-bottom: 6px;
+  background: transparent;
+  border: none;
+  margin-bottom: 0;
 }
 
 .bottom-btn.active { background: rgba(0, 224, 208, 0.15); }
