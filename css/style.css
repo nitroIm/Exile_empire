@@ -8,12 +8,10 @@ body {
   width: 100vw;
 }
 
-/* ===== ЗАСТАВКА ===== */
 #splash { position: fixed; top:0; left:0; right:0; bottom:0; z-index: 100; }
 #splash.hidden { display: none; }
 #splash img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ===== МЕНЮ ===== */
 #menu { position: fixed; top:0; left:0; right:0; bottom:0; display: none; }
 #menu.visible { display: block; }
 #menu img.bg {
@@ -32,7 +30,6 @@ body {
   align-items: center;
 }
 
-/* Кнопка по умолчанию (текстовая) */
 .menu-btn {
   width: 100%;
   max-width: 340px;
@@ -49,7 +46,6 @@ body {
   border-radius: 14px;
 }
 
-/* PLAY — картинка */
 .menu-btn.play {
   background-color: transparent;
   background-image: url('../ui/menu_button_play.PNG');
@@ -60,8 +56,6 @@ body {
   font-size: 0;
 }
 
-/* PROFILE — раскомментируй, когда загрузишь картинку */
-/*
 .menu-btn.profile {
   background-color: transparent;
   background-image: url('../ui/menu_button_profile.PNG');
@@ -71,35 +65,7 @@ body {
   color: transparent;
   font-size: 0;
 }
-*/
 
-/* SHOP — раскомментируй, когда загрузишь картинку */
-/*
-.menu-btn.shop {
-  background-color: transparent;
-  background-image: url('../ui/menu_button_shop.PNG');
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  border: none;
-  color: transparent;
-  font-size: 0;
-}
-*/
-
-/* SETTINGS — раскомментируй, когда загрузишь картинку */
-/*
-.menu-btn.settings {
-  background-color: transparent;
-  background-image: url('../ui/menu_button_settings.PNG');
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  border: none;
-  color: transparent;
-  font-size: 0;
-}
-*/
-
-/* ===== ИГРА ===== */
 #game {
   position: fixed; top:0; left:0; right:0; bottom:0;
   display: none; overflow: hidden;
@@ -117,7 +83,6 @@ body {
   position: absolute;
 }
 
-/* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
 #top-bar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -129,7 +94,6 @@ body {
   pointer-events: none;
 }
 
-/* ===== ПРОФИЛЬ ===== */
 #profile {
   position: relative;
   width: 110px;
@@ -196,7 +160,6 @@ body {
   height: 16px;
 }
 
-/* ===== РЕСУРСЫ ===== */
 #resources {
   display: flex;
   flex-direction: column;
@@ -211,7 +174,6 @@ body {
   pointer-events: auto;
 }
 
-/* ===== НИЖНЯЯ ПАНЕЛЬ ===== */
 #bottom-bar {
   position: fixed;
   bottom: 0; left: 0; right: 0;
