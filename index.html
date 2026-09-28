@@ -12,10 +12,8 @@
 <div id="splash">
   <div id="splash-inner">
     <img src="assets/splash.PNG" alt="splash">
-    <div id="loading-bar">
-      <div id="loading-fill"></div>
-    </div>
-    <div id="loading-percent">0%</div>
+    <div id="loading-bar"><div id="loading-fill"></div></div>
+    <div id="loading-percent" style="display:none">0%</div>
   </div>
 </div>
 
@@ -24,9 +22,43 @@
   <div class="dark"></div>
   <div class="buttons">
     <div class="menu-btn play" onclick="startGame()"></div>
-    <div class="menu-btn profile"></div>
+    <div class="menu-btn profile" onclick="openProfileScreen()"></div>
     <div class="menu-btn shop"></div>
     <div class="menu-btn settings"></div>
+  </div>
+</div>
+
+<!-- ЭКРАН ПРОФИЛЯ -->
+<div id="profile-screen">
+  <img class="bg" src="assets/Planet.PNG" alt="bg">
+  <div class="dark"></div>
+
+  <div id="profile-top">
+    <div id="profile-back" onclick="closeProfileScreen()">← НАЗАД</div>
+    <div id="profile-title">ПРОФИЛЬ</div>
+  </div>
+
+  <div id="profile-content">
+    <div id="profile-avatar-big">
+      <img src="ui/avatar_default.PNG" alt="">
+    </div>
+
+    <div class="profile-row">
+      <div class="profile-label">ИМЯ</div>
+      <input id="profile-name-input" type="text" placeholder="Введите имя">
+    </div>
+
+    <div class="profile-row">
+      <div class="profile-label">ЗВУК</div>
+      <div class="profile-toggle" id="toggle-sound">ВКЛ</div>
+    </div>
+
+    <div class="profile-row">
+      <div class="profile-label">МУЗЫКА</div>
+      <div class="profile-toggle" id="toggle-music">ВКЛ</div>
+    </div>
+
+    <div id="profile-save">СОХРАНИТЬ</div>
   </div>
 </div>
 
@@ -41,7 +73,6 @@
       <div id="player-rank">РЯДОВОЙ</div>
       <div id="player-rank-icons"></div>
     </div>
-
     <div id="resources">
       <span>METAL <span id="metal">0</span></span>
       <span>CRYSTAL <span id="crystal">0</span></span>
@@ -50,54 +81,20 @@
   </div>
 
   <div id="bottom-bar">
-    <div id="panel-handle">
-      <div class="handle-bar"></div>
-    </div>
-
+    <div id="panel-handle"><div class="handle-bar"></div></div>
     <div id="extra-row">
-      <div class="bottom-btn" onclick="openArmy()">
-        <img src="ui/icon_army.PNG" alt="">
-        <span>АРМИЯ</span>
-      </div>
-      <div class="bottom-btn" onclick="openScience()">
-        <img src="ui/icon_science.PNG" alt="">
-        <span>НАУКА</span>
-      </div>
-      <div class="bottom-btn" onclick="openFleet()">
-        <img src="ui/icon_fleet.PNG" alt="">
-        <span>ФЛОТ</span>
-      </div>
-      <div class="bottom-btn" onclick="openClan()">
-        <img src="ui/icon_clan.PNG" alt="">
-        <span>КЛАН</span>
-      </div>
-      <div class="bottom-btn" onclick="openQuests()">
-        <img src="ui/icon_quests.PNG" alt="">
-        <span>ЗАДАНИЯ</span>
-      </div>
+      <div class="bottom-btn" onclick="openArmy()"><img src="ui/icon_army.PNG" alt=""><span>АРМИЯ</span></div>
+      <div class="bottom-btn" onclick="openScience()"><img src="ui/icon_science.PNG" alt=""><span>НАУКА</span></div>
+      <div class="bottom-btn" onclick="openFleet()"><img src="ui/icon_fleet.PNG" alt=""><span>ФЛОТ</span></div>
+      <div class="bottom-btn" onclick="openClan()"><img src="ui/icon_clan.PNG" alt=""><span>КЛАН</span></div>
+      <div class="bottom-btn" onclick="openQuests()"><img src="ui/icon_quests.PNG" alt=""><span>ЗАДАНИЯ</span></div>
     </div>
-
     <div id="main-row">
-      <div class="bottom-btn" onclick="openBase()">
-        <img src="ui/icon_base.PNG" alt="">
-        <span>БАЗА</span>
-      </div>
-      <div class="bottom-btn" onclick="openMine()">
-        <img src="ui/icon_mine.PNG" alt="">
-        <span>РУДНИК</span>
-      </div>
-      <div class="bottom-btn big" onclick="openFight()">
-        <img src="ui/icon_fight.PNG" alt="">
-        <span>БОЙ</span>
-      </div>
-      <div class="bottom-btn" onclick="openMap()">
-        <img src="ui/icon_map.PNG" alt="">
-        <span>КАРТА</span>
-      </div>
-      <div class="bottom-btn" onclick="openShop()">
-        <img src="ui/icon_shop.PNG" alt="">
-        <span>МАГАЗИН</span>
-      </div>
+      <div class="bottom-btn" onclick="openBase()"><img src="ui/icon_base.PNG" alt=""><span>БАЗА</span></div>
+      <div class="bottom-btn" onclick="openMine()"><img src="ui/icon_mine.PNG" alt=""><span>РУДНИК</span></div>
+      <div class="bottom-btn big" onclick="openFight()"><img src="ui/icon_fight.PNG" alt=""><span>БОЙ</span></div>
+      <div class="bottom-btn" onclick="openMap()"><img src="ui/icon_map.PNG" alt=""><span>КАРТА</span></div>
+      <div class="bottom-btn" onclick="openShop()"><img src="ui/icon_shop.PNG" alt=""><span>МАГАЗИН</span></div>
     </div>
   </div>
 </div>
