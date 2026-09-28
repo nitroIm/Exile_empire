@@ -8,6 +8,7 @@ body {
   width: 100vw;
 }
 
+/* ===== ЗАСТАВКА ===== */
 #splash {
   position: fixed; top:0; left:0; right:0; bottom:0;
   z-index: 100;
@@ -18,67 +19,41 @@ body {
   overflow: hidden;
 }
 #splash.hidden { display: none; }
-
 #splash-inner {
   position: relative;
   width: min(100vw, 56.25vh);
   aspect-ratio: 9 / 16;
 }
+#splash-inner img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-#splash-inner img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* ПОЛОСКА — меняй только bottom (высоту от низа картинки) */
 #loading-bar {
   position: absolute;
   left: 27%;
   right: 22%;
-  bottom: 6%;        /* ← ТОЛЬКО ЭТО МЕНЯЙ */
+  bottom: 7%;
   height: 2.2%;
   z-index: 100;
   overflow: hidden;
 }
-
 #loading-fill {
-  width: 0%;
-  height: 100%;
+  width: 0%; height: 100%;
   background: #00e0d0;
   border-radius: 4px;
   box-shadow: 0 0 12px #00e0d0;
   transition: width 0.3s ease;
 }
 
-/* ЦИФРЫ УБРАНЫ */
-#loading-percent {
-  display: none;
-}
-
+/* ===== МЕНЮ ===== */
 #menu { position: fixed; top:0; left:0; right:0; bottom:0; display: none; }
 #menu.visible { display: block; }
-#menu img.bg {
-  position: absolute; top:0; left:0;
-  width: 100%; height: 100%; object-fit: cover;
-}
-#menu .dark {
-  position: absolute; top:0; left:0; right:0; bottom:0;
-  background: rgba(0,0,0,0.5);
-}
+#menu img.bg { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; }
+#menu .dark { position: absolute; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); }
 #menu .buttons {
-  position: absolute; bottom: 50px;
-  left: 0; right: 0; padding: 0 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  position: absolute; bottom: 50px; left: 0; right: 0; padding: 0 30px;
+  display: flex; flex-direction: column; align-items: center;
 }
 .menu-btn {
-  width: 100%;
-  max-width: 340px;
-  height: 90px;
-  margin-bottom: 14px;
+  width: 100%; max-width: 340px; height: 90px; margin-bottom: 14px;
   background-color: transparent;
   background-size: 100% 100%;
   background-repeat: no-repeat;
@@ -89,10 +64,110 @@ body {
 .menu-btn.shop     { background-image: url('../ui/menu_button_shop.PNG'); }
 .menu-btn.settings { background-image: url('../ui/menu_button_settings.PNG'); }
 
+/* ===== ЭКРАН ПРОФИЛЯ ===== */
+#profile-screen {
+  position: fixed; top:0; left:0; right:0; bottom:0;
+  display: none;
+  z-index: 50;
+}
+#profile-screen.visible { display: block; }
+#profile-screen img.bg {
+  position: absolute; top:0; left:0;
+  width: 100%; height: 100%; object-fit: cover;
+}
+#profile-screen .dark {
+  position: absolute; top:0; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.7);
+}
+
+#profile-top {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px;
+  z-index: 2;
+}
+#profile-back {
+  font-size: 14px; font-weight: bold; color: #d4a020;
+  letter-spacing: 1px; padding: 8px 14px;
+  border: 2px solid #d4a020; border-radius: 10px;
+  background: rgba(10, 14, 26, 0.7);
+}
+#profile-title {
+  font-size: 18px; font-weight: bold; color: #d4a020;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(0,0,0,0.9);
+}
+
+#profile-content {
+  position: absolute;
+  top: 80px; left: 20px; right: 20px; bottom: 20px;
+  z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+#profile-avatar-big {
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  border: 3px solid #d4a020;
+  overflow: hidden;
+  background: rgba(10, 14, 26, 0.8);
+}
+#profile-avatar-big img { width: 100%; height: 100%; object-fit: cover; }
+
+.profile-row {
+  width: 100%; max-width: 380px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  background: rgba(10, 14, 26, 0.85);
+  border: 2px solid #d4a020;
+  border-radius: 12px;
+}
+.profile-label {
+  font-size: 13px; font-weight: bold;
+  color: #d4a020; letter-spacing: 1px;
+}
+#profile-name-input {
+  flex: 1; margin-left: 14px;
+  background: transparent;
+  border: none; outline: none;
+  color: #fff; font-size: 14px; font-weight: bold;
+  text-align: right;
+  font-family: Arial, sans-serif;
+}
+#profile-name-input::placeholder { color: rgba(255,255,255,0.4); }
+
+.profile-toggle {
+  padding: 6px 16px;
+  background: #0a1430;
+  border: 2px solid #00e0d0;
+  border-radius: 8px;
+  font-size: 12px; font-weight: bold;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.profile-toggle.off {
+  border-color: #555;
+  color: #777;
+}
+
+#profile-save {
+  width: 100%; max-width: 380px;
+  padding: 18px;
+  background: rgba(10, 20, 48, 0.95);
+  border: 2px solid #d4a020;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 16px; font-weight: bold;
+  color: #d4a020; letter-spacing: 3px;
+  margin-top: auto;
+}
+
+/* ===== ИГРА ===== */
 #game {
   position: fixed; top:0; left:0; right:0; bottom:0;
-  display: none; overflow: hidden;
-  touch-action: none;
+  display: none; overflow: hidden; touch-action: none;
 }
 #game.visible { display: block; }
 
@@ -101,96 +176,62 @@ body {
   touch-action: none; user-select: none;
 }
 #world img {
-  display: block;
-  width: 1024px; height: 1024px;
+  display: block; width: 1024px; height: 1024px;
   position: absolute;
 }
 
 #top-bar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
+  position: fixed; top: 0; left: 0; right: 0;
   padding: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  display: flex; justify-content: space-between; align-items: flex-start;
   z-index: 15;
   pointer-events: none;
 }
-
 #profile {
-  position: relative;
-  width: 110px;
-  height: 150px;
-  margin: 0;
-  pointer-events: auto;
+  position: relative; width: 110px; height: 150px;
+  margin: 0; pointer-events: auto;
 }
 #profile .frame {
-  position: absolute;
-  top: 0; left: 0;
+  position: absolute; top: 0; left: 0;
   width: 100%; height: 100%;
   pointer-events: none;
 }
 #player-name {
-  position: absolute;
-  top: 16px;
-  left: 0; right: 0;
-  text-align: center;
-  font-size: 9px;
-  font-weight: bold;
-  color: #d4a020;
-  letter-spacing: 0.3px;
+  position: absolute; top: 16px; left: 0; right: 0;
+  text-align: center; font-size: 9px; font-weight: bold;
+  color: #d4a020; letter-spacing: 0.3px;
   text-shadow: 0 0 3px rgba(0,0,0,0.9);
 }
 #avatar {
-  position: absolute;
-  top: 32px;
-  left: 50%;
+  position: absolute; top: 32px; left: 50%;
   transform: translateX(-50%);
-  width: 58px;
-  height: 58px;
+  width: 58px; height: 58px;
   object-fit: cover;
-  border: 2px solid #d4a020;
-  border-radius: 50%;
+  border: 2px solid #d4a020; border-radius: 50%;
 }
 #player-rank {
-  position: absolute;
-  top: 96px;
-  left: 0; right: 0;
-  text-align: center;
-  font-size: 10px;
-  font-weight: bold;
-  color: #d4a020;
-  letter-spacing: 0.3px;
+  position: absolute; top: 96px; left: 0; right: 0;
+  text-align: center; font-size: 10px; font-weight: bold;
+  color: #d4a020; letter-spacing: 0.3px;
   text-shadow: 0 0 3px rgba(0,0,0,0.9);
 }
 #player-rank-icons {
-  position: absolute;
-  top: 112px;
-  left: 0; right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 3px;
-  height: 20px;
+  position: absolute; top: 112px; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 3px; height: 20px;
 }
 #player-rank-icons img { width: 16px; height: 16px; }
 
 #resources {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 6px 10px;
-  margin: 6px 8px 0 0;
+  display: flex; flex-direction: column; gap: 3px;
+  padding: 6px 10px; margin: 6px 8px 0 0;
   background: rgba(10, 14, 26, 0.9);
-  border: 2px solid #d4a020;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: bold;
+  border: 2px solid #d4a020; border-radius: 10px;
+  font-size: 10px; font-weight: bold;
   pointer-events: auto;
 }
 
 #bottom-bar {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
+  position: fixed; bottom: 0; left: 0; right: 0;
   background-color: transparent;
   background-image: url('../ui/panel_frame.PNG');
   background-size: 100% 100%;
@@ -201,43 +242,27 @@ body {
   max-height: 75vh;
 }
 #panel-handle {
-  position: absolute;
-  top: -12px;
-  left: 50%;
+  position: absolute; top: -12px; left: 50%;
   transform: translateX(-50%);
-  width: 60px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 25;
+  width: 60px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 25;
 }
 .handle-bar {
   width: 50px; height: 4px;
-  background: #00e0d0;
-  border-radius: 2px;
-  opacity: 0.7;
+  background: #00e0d0; border-radius: 2px; opacity: 0.7;
 }
 #extra-row {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  display: flex; justify-content: space-around; align-items: center;
   padding: 0 6px 4px;
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
+  overflow: hidden; max-height: 0; opacity: 0;
   transition: max-height 0.35s ease, opacity 0.35s ease;
 }
 #bottom-bar.expanded #extra-row {
-  max-height: 90px;
-  opacity: 1;
-  margin-bottom: 4px;
+  max-height: 90px; opacity: 1; margin-bottom: 4px;
 }
 #main-row {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  display: flex; justify-content: space-around; align-items: center;
   padding: 0 6px 0 6px;
 }
 .bottom-btn {
@@ -255,21 +280,13 @@ body {
 #main-row .bottom-btn:nth-child(4) {
   transform: translateY(14px);
 }
-.bottom-btn img {
-  width: 44px; height: 44px;
-  display: block; margin-bottom: 2px;
-}
+.bottom-btn img { width: 44px; height: 44px; display: block; margin-bottom: 2px; }
 .bottom-btn span {
-  font-size: 10px; font-weight: bold;
-  color: #fff; letter-spacing: 0.5px;
-  text-align: center;
+  font-size: 10px; font-weight: bold; color: #fff;
+  letter-spacing: 0.5px; text-align: center;
 }
 .bottom-btn.big img { width: 44px; height: 44px; }
 .bottom-btn.big span { font-size: 10px; color: #fff; }
-.bottom-btn.big {
-  background: transparent;
-  border: none;
-  margin-bottom: 0;
-}
+.bottom-btn.big { background: transparent; border: none; margin-bottom: 0; }
 .bottom-btn.active { background: rgba(0, 224, 208, 0.15); }
 .bottom-btn.active span { color: #d4a020; }
