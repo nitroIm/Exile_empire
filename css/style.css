@@ -36,8 +36,8 @@ body {
 /* Полоска — внутри рамки между золотыми стрелками */
 #loading-bar {
   position: absolute;
-  left: 23%;
-  right: 23%;
+  left: 27%;
+  right: 22%;
   bottom: 10%;
   height: 2%;
   z-index: 100;
