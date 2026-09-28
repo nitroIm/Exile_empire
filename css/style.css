@@ -20,7 +20,6 @@ body {
 }
 #splash.hidden { display: none; }
 
-/* Контейнер ровно по пропорциям картинки 9:16 */
 #splash-inner {
   position: relative;
   width: min(100vw, 56.25vh);
@@ -34,13 +33,13 @@ body {
   display: block;
 }
 
-/* Полоска — в % от КАРТИНКИ, не от экрана */
+/* Полоска внутри рамки загрузчика (между золотыми стрелками) */
 #loading-bar {
   position: absolute;
-  left: 27%;
-  right: 27%;
-  bottom: 8%;
-  height: 1.6%;
+  left: 26%;
+  right: 26%;
+  bottom: 13.5%;
+  height: 2%;
   z-index: 100;
   overflow: hidden;
 }
@@ -54,12 +53,13 @@ body {
   transition: width 0.3s ease;
 }
 
+/* Процент — над полоской, внутри тёмного окна рамки */
 #loading-percent {
   position: absolute;
   left: 0; right: 0;
-  bottom: 10.5%;
+  bottom: 16%;
   text-align: center;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: bold;
   color: #d4a020;
   letter-spacing: 2px;
@@ -86,7 +86,6 @@ body {
   flex-direction: column;
   align-items: center;
 }
-
 .menu-btn {
   width: 100%;
   max-width: 340px;
@@ -138,7 +137,6 @@ body {
   margin: 0;
   pointer-events: auto;
 }
-
 #profile .frame {
   position: absolute;
   top: 0; left: 0;
@@ -157,7 +155,6 @@ body {
   letter-spacing: 0.3px;
   text-shadow: 0 0 3px rgba(0,0,0,0.9);
 }
-
 #avatar {
   position: absolute;
   top: 32px;
@@ -169,7 +166,6 @@ body {
   border: 2px solid #d4a020;
   border-radius: 50%;
 }
-
 #player-rank {
   position: absolute;
   top: 96px;
@@ -181,7 +177,6 @@ body {
   letter-spacing: 0.3px;
   text-shadow: 0 0 3px rgba(0,0,0,0.9);
 }
-
 #player-rank-icons {
   position: absolute;
   top: 112px;
@@ -191,7 +186,6 @@ body {
   gap: 3px;
   height: 20px;
 }
-
 #player-rank-icons img { width: 16px; height: 16px; }
 
 #resources {
@@ -220,7 +214,6 @@ body {
   padding: 40px 25px 35px 25px;
   max-height: 75vh;
 }
-
 #panel-handle {
   position: absolute;
   top: -12px;
@@ -240,7 +233,6 @@ body {
   border-radius: 2px;
   opacity: 0.7;
 }
-
 #extra-row {
   display: flex;
   justify-content: space-around;
@@ -256,14 +248,12 @@ body {
   opacity: 1;
   margin-bottom: 4px;
 }
-
 #main-row {
   display: flex;
   justify-content: space-around;
   align-items: center;
   padding: 0 6px 0 6px;
 }
-
 .bottom-btn {
   flex: 1;
   display: flex; flex-direction: column;
@@ -274,24 +264,20 @@ body {
   transition: all 0.2s;
   transform: translateY(0);
 }
-
 #main-row .bottom-btn:nth-child(2),
 #main-row .bottom-btn:nth-child(3),
 #main-row .bottom-btn:nth-child(4) {
   transform: translateY(14px);
 }
-
 .bottom-btn img {
   width: 44px; height: 44px;
   display: block; margin-bottom: 2px;
 }
-
 .bottom-btn span {
   font-size: 10px; font-weight: bold;
   color: #fff; letter-spacing: 0.5px;
   text-align: center;
 }
-
 .bottom-btn.big img { width: 44px; height: 44px; }
 .bottom-btn.big span { font-size: 10px; color: #fff; }
 .bottom-btn.big {
@@ -299,6 +285,5 @@ body {
   border: none;
   margin-bottom: 0;
 }
-
 .bottom-btn.active { background: rgba(0, 224, 208, 0.15); }
 .bottom-btn.active span { color: #d4a020; }
