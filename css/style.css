@@ -33,12 +33,12 @@ body {
   display: block;
 }
 
-/* Полоска внутри рамки загрузчика */
+/* Полоска — внутри рамки между золотыми стрелками */
 #loading-bar {
   position: absolute;
-  left: 26%;
-  right: 26%;
-  bottom: 5%;
+  left: 23%;
+  right: 23%;
+  bottom: 10%;
   height: 2%;
   z-index: 100;
   overflow: hidden;
@@ -53,11 +53,11 @@ body {
   transition: width 0.3s ease;
 }
 
-/* Процент над полоской */
+/* Процент — над рамкой */
 #loading-percent {
   position: absolute;
   left: 0; right: 0;
-  bottom: 8%;
+  bottom: 13.5%;
   text-align: center;
   font-size: 20px;
   font-weight: bold;
