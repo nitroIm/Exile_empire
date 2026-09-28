@@ -12,15 +12,16 @@ body {
 #splash.hidden { display: none; }
 #splash img { width: 100%; height: 100%; object-fit: cover; }
 
-/* Контейнер загрузчика */
+/* ТЕСТОВАЯ ПОЛОСКА — красный фон видно где контейнер */
 #loading-bar {
   position: absolute;
   left: 32%;
   right: 32%;
-  bottom: 6%;
+  bottom: 4%;
   height: 1.6%;
   z-index: 100;
   overflow: hidden;
+  background: rgba(255, 0, 0, 0.4);
 }
 
 #loading-fill {
@@ -32,7 +33,6 @@ body {
   transition: width 0.3s ease;
 }
 
-/* Процент над рамкой загрузчика */
 #loading-percent {
   position: absolute;
   left: 0; right: 0;
