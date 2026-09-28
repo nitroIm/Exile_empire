@@ -134,10 +134,39 @@ function heroMoveTo(clientX, clientY) {
 var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
-setTimeout(function() {
-  document.getElementById('splash').className = 'hidden';
-  document.getElementById('menu').className = 'visible';
-}, 7000);
+// ============ ЗАГРУЗЧИК ============
+(function initLoader() {
+  var fill = document.getElementById('loading-fill');
+  var percent = document.getElementById('loading-percent');
+  var progress = 0;
+  var startTime = Date.now();
+  var duration = 5000;
+
+  function tick() {
+    var elapsed = Date.now() - startTime;
+    var t = Math.min(1, elapsed / duration);
+
+    var eased = 1 - Math.pow(1 - t, 2.5);
+    var jitter = Math.sin(elapsed / 400) * 0.03;
+    progress = Math.min(100, (eased + jitter) * 100);
+    if (progress < 0) progress = 0;
+
+    if (fill) fill.style.width = progress + '%';
+    if (percent) percent.textContent = Math.floor(progress) + '%';
+
+    if (t < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      if (fill) fill.style.width = '100%';
+      if (percent) percent.textContent = '100%';
+      setTimeout(function() {
+        document.getElementById('splash').className = 'hidden';
+        document.getElementById('menu').className = 'visible';
+      }, 400);
+    }
+  }
+  tick();
+})();
 
 // ============ PLAY ============
 window.startGame = function() {
@@ -255,6 +284,7 @@ function initMap() {
 (function initPanel() {
   var bar = document.getElementById('bottom-bar');
   var handle = document.getElementById('panel-handle');
+  if (!bar || !handle) return;
 
   handle.addEventListener('click', function() {
     bar.classList.toggle('expanded');
