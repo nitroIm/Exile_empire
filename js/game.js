@@ -134,39 +134,38 @@ function heroMoveTo(clientX, clientY) {
 var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
-// ============ ЗАГРУЗЧИК ============
-(function initLoader() {
+// ============================================
+// ЗАГРУЗЧИК
+// ============================================
+var loaderProgress = 0;
+var loaderStart = Date.now();
+var loaderDuration = 5000;
+
+var loaderInterval = setInterval(function() {
+  var elapsed = Date.now() - loaderStart;
+  var t = elapsed / loaderDuration;
+  if (t > 1) t = 1;
+
+  var eased = 1 - Math.pow(1 - t, 2.5);
+  var jitter = Math.sin(elapsed / 400) * 0.03;
+  loaderProgress = Math.min(100, Math.max(0, (eased + jitter) * 100));
+
   var fill = document.getElementById('loading-fill');
   var percent = document.getElementById('loading-percent');
-  var progress = 0;
-  var startTime = Date.now();
-  var duration = 5000;
 
-  function tick() {
-    var elapsed = Date.now() - startTime;
-    var t = Math.min(1, elapsed / duration);
+  if (fill) fill.style.width = loaderProgress + '%';
+  if (percent) percent.textContent = Math.floor(loaderProgress) + '%';
 
-    var eased = 1 - Math.pow(1 - t, 2.5);
-    var jitter = Math.sin(elapsed / 400) * 0.03;
-    progress = Math.min(100, (eased + jitter) * 100);
-    if (progress < 0) progress = 0;
-
-    if (fill) fill.style.width = progress + '%';
-    if (percent) percent.textContent = Math.floor(progress) + '%';
-
-    if (t < 1) {
-      requestAnimationFrame(tick);
-    } else {
-      if (fill) fill.style.width = '100%';
-      if (percent) percent.textContent = '100%';
-      setTimeout(function() {
-        document.getElementById('splash').className = 'hidden';
-        document.getElementById('menu').className = 'visible';
-      }, 400);
-    }
+  if (t >= 1) {
+    clearInterval(loaderInterval);
+    if (fill) fill.style.width = '100%';
+    if (percent) percent.textContent = '100%';
+    setTimeout(function() {
+      document.getElementById('splash').className = 'hidden';
+      document.getElementById('menu').className = 'visible';
+    }, 400);
   }
-  tick();
-})();
+}, 50);
 
 // ============ PLAY ============
 window.startGame = function() {
