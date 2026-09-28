@@ -139,7 +139,7 @@ if (tg) { tg.ready(); tg.expand(); }
 // ============================================
 var loaderProgress = 0;
 var loaderStart = Date.now();
-var loaderDuration = 20000;
+var loaderDuration = 10000;
 
 var loaderInterval = setInterval(function() {
   var elapsed = Date.now() - loaderStart;
