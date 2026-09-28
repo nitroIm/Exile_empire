@@ -15,8 +15,8 @@ body {
 
 #loading-fill {
   position: absolute;
-  left: 30%;
-  bottom: 11.2%;
+  left: 28%;
+  bottom: 8.5%;
   width: 0%;
   height: 1.6%;
   background: #00e0d0;
@@ -29,9 +29,9 @@ body {
 #loading-percent {
   position: absolute;
   left: 0; right: 0;
-  bottom: 11.6%;
+  bottom: 9%;
   text-align: center;
-  font-size: 26px;
+  font-size: 24px;
   font-weight: bold;
   color: #d4a020;
   letter-spacing: 2px;
@@ -93,7 +93,6 @@ body {
   position: absolute;
 }
 
-/* ===== ВЕРХНЯЯ ПАНЕЛЬ ===== */
 #top-bar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -105,7 +104,6 @@ body {
   pointer-events: none;
 }
 
-/* ===== ПРОФИЛЬ ===== */
 #profile {
   position: relative;
   width: 110px;
@@ -169,7 +167,6 @@ body {
 
 #player-rank-icons img { width: 16px; height: 16px; }
 
-/* ===== РЕСУРСЫ ===== */
 #resources {
   display: flex;
   flex-direction: column;
@@ -184,7 +181,6 @@ body {
   pointer-events: auto;
 }
 
-/* ===== НИЖНЯЯ ПАНЕЛЬ ===== */
 #bottom-bar {
   position: fixed;
   bottom: 0; left: 0; right: 0;
