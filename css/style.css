@@ -8,20 +8,41 @@ body {
   width: 100vw;
 }
 
-#splash { position: fixed; top:0; left:0; right:0; bottom:0; z-index: 100; }
+/* ===== ЗАСТАВКА ===== */
+#splash {
+  position: fixed; top:0; left:0; right:0; bottom:0;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
 #splash.hidden { display: none; }
-#splash img { width: 100%; height: 100%; object-fit: cover; }
 
-/* ТЕСТОВАЯ ПОЛОСКА — красный фон видно где контейнер */
+/* Контейнер ровно по пропорциям картинки 9:16 */
+#splash-inner {
+  position: relative;
+  width: min(100vw, 56.25vh);
+  aspect-ratio: 9 / 16;
+}
+
+#splash-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Полоска — в % от КАРТИНКИ, не от экрана */
 #loading-bar {
   position: absolute;
-  left: 32%;
-  right: 32%;
-  bottom: 4%;
+  left: 27%;
+  right: 27%;
+  bottom: 8%;
   height: 1.6%;
   z-index: 100;
   overflow: hidden;
-  background: rgba(255, 0, 0, 0.4);
 }
 
 #loading-fill {
@@ -36,9 +57,9 @@ body {
 #loading-percent {
   position: absolute;
   left: 0; right: 0;
-  bottom: 7%;
+  bottom: 10.5%;
   text-align: center;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: bold;
   color: #d4a020;
   letter-spacing: 2px;
@@ -47,6 +68,7 @@ body {
   pointer-events: none;
 }
 
+/* ===== МЕНЮ ===== */
 #menu { position: fixed; top:0; left:0; right:0; bottom:0; display: none; }
 #menu.visible { display: block; }
 #menu img.bg {
@@ -75,12 +97,12 @@ body {
   background-repeat: no-repeat;
   border: none;
 }
-
 .menu-btn.play     { background-image: url('../ui/menu_button_play.PNG'); }
 .menu-btn.profile  { background-image: url('../ui/menu_button_profile.PNG'); }
 .menu-btn.shop     { background-image: url('../ui/menu_button_shop.PNG'); }
 .menu-btn.settings { background-image: url('../ui/menu_button_settings.PNG'); }
 
+/* ===== ИГРА ===== */
 #game {
   position: fixed; top:0; left:0; right:0; bottom:0;
   display: none; overflow: hidden;
