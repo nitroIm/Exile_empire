@@ -13,23 +13,32 @@ body {
 #splash.hidden { display: none; }
 #splash img { width: 100%; height: 100%; object-fit: cover; }
 
-#loading-fill {
+/* Контейнер загрузчика — невидимый, ограничивает полоску между золотыми */
+#loading-bar {
   position: absolute;
-  left: 28%;
-  bottom: 8.5%;
-  width: 0%;
+  left: 27%;
+  right: 22%;
+  bottom: 8.4%;
   height: 1.6%;
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* Сама полоска — растёт внутри контейнера */
+#loading-fill {
+  width: 0%;
+  height: 100%;
   background: #00e0d0;
   border-radius: 4px;
   box-shadow: 0 0 12px #00e0d0, 0 0 4px #00e0d0 inset;
   transition: width 0.3s ease;
-  z-index: 100;
 }
 
+/* Процент над полоской */
 #loading-percent {
   position: absolute;
   left: 0; right: 0;
-  bottom: 9%;
+  bottom: 8.8%;
   text-align: center;
   font-size: 24px;
   font-weight: bold;
