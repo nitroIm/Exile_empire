@@ -85,6 +85,7 @@
 <div id="game">
   <div id="world"></div>
 
+  <!-- ВЕРХНЯЯ ПАНЕЛЬ: ПРОФИЛЬ + РЕСУРСЫ + АРМИЯ -->
   <div id="top-bar">
     <div id="profile">
       <img class="frame" src="ui/profile_frame.PNG" alt="">
@@ -93,10 +94,27 @@
       <div id="player-rank">РЯДОВОЙ</div>
       <div id="player-rank-icons"></div>
     </div>
-    <div id="resources">
-      <span>METAL <span id="metal">0</span></span>
-      <span>CRYSTAL <span id="crystal">0</span></span>
-      <span>STARS <span id="stars">0</span></span>
+
+    <div id="right-panel">
+      <div id="resource-chips">
+        <div class="chip">
+          <div class="chip-icon chip-icon-metal"></div>
+          <span id="metal">500</span>
+        </div>
+        <div class="chip">
+          <div class="chip-icon chip-icon-crystal"></div>
+          <span id="crystal">200</span>
+        </div>
+        <div class="chip">
+          <div class="chip-icon chip-icon-energy"></div>
+          <span id="energy">100</span>
+        </div>
+      </div>
+
+      <div id="army-bar">
+        <div class="army-icon"></div>
+        <span id="army">0</span>
+      </div>
     </div>
   </div>
 
