@@ -310,17 +310,31 @@ body {
   object-fit: cover;
   border: 2px solid #d4a020; border-radius: 50%;
 }
-#player-rank {
-  position: absolute; top: 96px; left: 0; right: 0;
-  text-align: center; font-size: 10px; font-weight: bold;
-  color: #d4a020; letter-spacing: 0.3px;
+
+/* Блок звания: имя звания + иконка-знак */
+#player-rank-block {
+  position: absolute;
+  top: 96px;
+  left: 0; right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+#player-rank-name {
+  font-size: 10px;
+  font-weight: bold;
+  color: #d4a020;
+  letter-spacing: 0.3px;
   text-shadow: 0 0 3px rgba(0,0,0,0.9);
+  text-align: center;
 }
-#player-rank-icons {
-  position: absolute; top: 112px; left: 0; right: 0;
-  display: flex; justify-content: center; gap: 3px; height: 20px;
+#player-rank-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(212, 160, 32, 0.6));
 }
-#player-rank-icons img { width: 16px; height: 16px; }
 
 /* Правый блок */
 #right-panel {
@@ -336,7 +350,6 @@ body {
   display: flex;
   gap: 3px;
 }
-
 .chip {
   flex: 1;
   display: flex;
@@ -358,8 +371,7 @@ body {
   text-overflow: ellipsis;
 }
 .chip-icon {
-  width: 16px;
-  height: 16px;
+  width: 16px; height: 16px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -379,8 +391,7 @@ body {
   box-shadow: 0 0 10px rgba(212, 160, 32, 0.3);
 }
 .army-icon {
-  width: 18px;
-  height: 18px;
+  width: 18px; height: 18px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -392,8 +403,8 @@ body {
 /* ===== ШЕСТЕРЁНКА ===== */
 #gear-btn {
   position: fixed;
-  top: 175px;
-  left: 38%;
+  top: 65px;
+  left: 34%;
   width: 38px;
   height: 38px;
   z-index: 16;
@@ -408,9 +419,7 @@ body {
   object-fit: contain;
   filter: drop-shadow(0 0 6px rgba(212, 160, 32, 0.6));
 }
-#gear-btn:active img {
-  transform: scale(0.92);
-}
+#gear-btn:active img { transform: scale(0.92); }
 
 /* ===== МЕНЮ ШЕСТЕРЁНКИ ===== */
 #gear-menu {
@@ -421,9 +430,7 @@ body {
   align-items: center;
   justify-content: center;
 }
-#gear-menu.visible {
-  display: flex;
-}
+#gear-menu.visible { display: flex; }
 #gear-menu img.bg {
   position: absolute; top:0; left:0;
   width: 100%; height: 100%; object-fit: cover;
