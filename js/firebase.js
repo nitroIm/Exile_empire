@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -10,19 +11,18 @@ const firebaseConfig = {
   appId: "1:465765692374:web:c6b984f3ba91ecc22c2a77"
 };
 
-let db = null;
+let app, db, auth;
 try {
-  const app = initializeApp(firebaseConfig);
+  app = initializeApp(firebaseConfig);
   db = getFirestore(app);
+  auth = getAuth(app);
 } catch(e) { console.log('Firebase init error:', e); }
 
-// ============ ID ИГРОКА ============
+// ============ ID ИГРОКА (из Telegram) ============
 window.getPlayerId = function() {
-  // Если в Telegram — берём настоящий ID
-  if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+  if (window.Telegram?.WebApp?.initDataUnsafe?.user?.id) {
     return 'tg_' + window.Telegram.WebApp.initDataUnsafe.user.id;
   }
-  // Если в браузере (для теста) — фиксированный ID
   let testId = localStorage.getItem('test_player_id');
   if (!testId) {
     testId = 'test_user_1';
@@ -31,32 +31,45 @@ window.getPlayerId = function() {
   return testId;
 };
 
+// ============ АНОНИМНЫЙ ВХОД ============
+let authReady = false;
+let authPromise = new Promise(function(resolve) {
+  if (!auth) { resolve(null); return; }
+  onAuthStateChanged(auth, function(user) {
+    if (user) {
+      authReady = true;
+      console.log('✅ Авторизация готова, uid:', user.uid);
+      resolve(user);
+    }
+  });
+  // Пробуем войти анонимно
+  signInAnonymously(auth).catch(function(e) {
+    console.log('Ошибка авторизации:', e);
+    resolve(null);
+  });
+});
+
 // ============ ЗАГРУЗКА ИГРОКА ============
 window.loadPlayer = async function() {
-  if (!db) return null;
+  await authPromise;
+  if (!db || !authReady) { console.log('Нет авторизации'); return null; }
   const playerId = window.getPlayerId();
   try {
     const docRef = doc(db, 'players', playerId);
     const snap = await getDoc(docRef);
-
     if (snap.exists()) {
       const data = snap.data();
       console.log('Игрок загружен:', data);
-      // Применяем данные к UI
       if (window.applyProfileData) window.applyProfileData(data);
       return data;
     } else {
-      // Новый игрок
       const newPlayer = {
         name: (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Адмирал').slice(0, 15),
         avatar: window.Telegram?.WebApp?.initDataUnsafe?.user?.photo_url || '',
-        soundOn: true,
-        musicOn: true,
-        soundVol: 100,
-        musicVol: 100,
-        metal: 500,
-        crystal: 200,
-        stars: 0,
+        soundOn: true, musicOn: true,
+        soundVol: 100, musicVol: 40,
+        metal: 500, crystal: 200, energy: 100,
+        army: 0, stars: 0,
         rank: 'РЯДОВОЙ',
         createdAt: new Date().toISOString()
       };
@@ -66,22 +79,22 @@ window.loadPlayer = async function() {
       return newPlayer;
     }
   } catch(e) {
-    console.log('Firebase load error:', e);
+    console.log('Ошибка загрузки:', e);
     return null;
   }
 };
 
 // ============ СОХРАНЕНИЕ ИГРОКА ============
 window.savePlayer = async function(data) {
-  if (!db) return false;
+  await authPromise;
+  if (!db || !authReady) return false;
   const playerId = window.getPlayerId();
   try {
-    const docRef = doc(db, 'players', playerId);
-    await setDoc(docRef, data, { merge: true });
+    await setDoc(doc(db, 'players', playerId), data, { merge: true });
     console.log('Игрок сохранён:', data);
     return true;
   } catch(e) {
-    console.log('Firebase save error:', e);
+    console.log('Ошибка сохранения:', e);
     return false;
   }
 };
