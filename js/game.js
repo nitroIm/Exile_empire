@@ -7,7 +7,6 @@ var MAPS = [
   { file: "maps/map_3.PNG",  col: 0, row: 1 },
   { file: "maps/map_4.PNG",  col: 1, row: 1 }
 ];
-
 var TILE = 1024;
 var WORLD_W = 2048;
 var WORLD_H = 2048;
@@ -18,7 +17,6 @@ var WORLD_H = 2048;
 var HERO_SIZE = 128;
 var HERO_SPEED = 4;
 var HERO_FRAME_TIME = 8;
-
 var HERO_FRAMES = {
   up:    ['characters/hero/up_1.PNG',    'characters/hero/up_2.PNG'],
   down:  ['characters/hero/down_1.PNG',  'characters/hero/down_2.PNG'],
@@ -28,13 +26,9 @@ var HERO_FRAMES = {
 var HERO_IDLE = 'characters/hero/up_1.PNG';
 
 var hero = {
-  x: 1024, y: 1024,
-  targetX: 1024, targetY: 1024,
-  el: null,
-  frameIndex: 0,
-  frameCounter: 0,
-  moving: false,
-  dir: 'up'
+  x: 1024, y: 1024, targetX: 1024, targetY: 1024,
+  el: null, frameIndex: 0, frameCounter: 0,
+  moving: false, dir: 'up'
 };
 
 // ============ СБОРКА МИРА ============
@@ -52,7 +46,6 @@ var hero = {
     img.style.height = TILE + 'px';
     world.appendChild(img);
   });
-
   var heroEl = document.createElement('img');
   heroEl.src = HERO_IDLE;
   heroEl.style.position = 'absolute';
@@ -64,7 +57,6 @@ var hero = {
   heroEl.style.zIndex = '5';
   world.appendChild(heroEl);
   hero.el = heroEl;
-
   heroLoop();
 })();
 
@@ -74,31 +66,20 @@ function heroLoop() {
     var dx = hero.targetX - hero.x;
     var dy = hero.targetY - hero.y;
     var dist = Math.sqrt(dx*dx + dy*dy);
-
     if (dist > 3) {
       hero.x += (dx / dist) * HERO_SPEED;
       hero.y += (dy / dist) * HERO_SPEED;
       hero.el.style.left = hero.x + 'px';
       hero.el.style.top = hero.y + 'px';
-
-      if (Math.abs(dx) > Math.abs(dy)) {
-        hero.dir = dx > 0 ? 'right' : 'left';
-      } else {
-        hero.dir = dy > 0 ? 'down' : 'up';
-      }
-
+      if (Math.abs(dx) > Math.abs(dy)) hero.dir = dx > 0 ? 'right' : 'left';
+      else hero.dir = dy > 0 ? 'down' : 'up';
       hero.frameCounter++;
       if (hero.frameCounter >= HERO_FRAME_TIME) {
         hero.frameCounter = 0;
         hero.frameIndex = (hero.frameIndex + 1) % HERO_FRAMES[hero.dir].length;
         hero.el.src = HERO_FRAMES[hero.dir][hero.frameIndex];
       }
-
-      if (hero.dir === 'right') {
-        hero.el.style.transform = 'scaleX(-1)';
-      } else {
-        hero.el.style.transform = 'scaleX(1)';
-      }
+      hero.el.style.transform = hero.dir === 'right' ? 'scaleX(-1)' : 'scaleX(1)';
     } else {
       hero.x = hero.targetX;
       hero.y = hero.targetY;
@@ -119,12 +100,10 @@ function heroMoveTo(clientX, clientY) {
   var scaleY = WORLD_H / rect.height;
   var x = (clientX - rect.left) * scaleX;
   var y = (clientY - rect.top) * scaleY;
-
   if (x < HERO_SIZE/2) x = HERO_SIZE/2;
   if (x > WORLD_W - HERO_SIZE/2) x = WORLD_W - HERO_SIZE/2;
   if (y < HERO_SIZE/2) y = HERO_SIZE/2;
   if (y > WORLD_H - HERO_SIZE/2) y = WORLD_H - HERO_SIZE/2;
-
   hero.targetX = x;
   hero.targetY = y;
   hero.moving = true;
@@ -139,27 +118,19 @@ if (tg) { tg.ready(); tg.expand(); }
 // ============================================
 var loaderProgress = 0;
 var loaderStart = Date.now();
-var loaderDuration = 10000;
-
+var loaderDuration = 5000;
 var loaderInterval = setInterval(function() {
   var elapsed = Date.now() - loaderStart;
   var t = elapsed / loaderDuration;
   if (t > 1) t = 1;
-
   var eased = 1 - Math.pow(1 - t, 2.5);
   var jitter = Math.sin(elapsed / 400) * 0.03;
   loaderProgress = Math.min(100, Math.max(0, (eased + jitter) * 100));
-
   var fill = document.getElementById('loading-fill');
-  var percent = document.getElementById('loading-percent');
-
   if (fill) fill.style.width = loaderProgress + '%';
-  if (percent) percent.textContent = Math.floor(loaderProgress) + '%';
-
   if (t >= 1) {
     clearInterval(loaderInterval);
     if (fill) fill.style.width = '100%';
-    if (percent) percent.textContent = '100%';
     setTimeout(function() {
       document.getElementById('splash').className = 'hidden';
       document.getElementById('menu').className = 'visible';
@@ -167,7 +138,9 @@ var loaderInterval = setInterval(function() {
   }
 }, 50);
 
-// ============ PLAY ============
+// ============================================
+// ПЕРЕХОДЫ МЕЖДУ ЭКРАНАМИ
+// ============================================
 window.startGame = function() {
   document.getElementById('menu').className = '';
   document.getElementById('game').className = 'visible';
@@ -175,16 +148,28 @@ window.startGame = function() {
   if (window.loadPlayer) window.loadPlayer();
 };
 
-// ============ СВАЙП + ЗУМ + ТАП ============
+window.openProfileScreen = function() {
+  if (tg) tg.HapticFeedback?.impactOccurred('light');
+  document.getElementById('menu').className = '';
+  document.getElementById('profile-screen').className = 'visible';
+};
+
+window.closeProfileScreen = function() {
+  if (tg) tg.HapticFeedback?.impactOccurred('light');
+  document.getElementById('profile-screen').className = '';
+  document.getElementById('menu').className = 'visible';
+};
+
+// ============================================
+// СВАЙП + ЗУМ + ТАП
+// ============================================
 function initMap() {
   var world = document.getElementById('world');
   var game = document.getElementById('game');
   var posX = 0, posY = 0, scale = 1;
-
   posX = -(WORLD_W - window.innerWidth) / 2;
   posY = -(WORLD_H - window.innerHeight) / 2;
   apply();
-
   var startX = 0, startY = 0;
   var startDist = 0, startScale = 1;
   var dragging = false, pinching = false;
@@ -221,26 +206,19 @@ function initMap() {
       posX = e.touches[0].clientX - startX;
       posY = e.touches[0].clientY - startY;
       if (Math.abs(e.touches[0].clientX - touchStartX) > 10 ||
-          Math.abs(e.touches[0].clientY - touchStartY) > 10) {
-        moved = true;
-      }
-      clamp();
-      apply();
+          Math.abs(e.touches[0].clientY - touchStartY) > 10) moved = true;
+      clamp(); apply();
     } else if (pinching && e.touches.length === 2) {
       var d = distance(e.touches[0], e.touches[1]);
       var newScale = startScale * (d / startDist);
       if (newScale < 0.7) newScale = 0.7;
       if (newScale > 3) newScale = 3;
-
       var worldX_at_center = (pinchCenterX - pinchStartPosX) / startScale;
       var worldY_at_center = (pinchCenterY - pinchStartPosY) / startScale;
-
       posX = pinchCenterX - worldX_at_center * newScale;
       posY = pinchCenterY - worldY_at_center * newScale;
-
       scale = newScale;
-      clamp();
-      apply();
+      clamp(); apply();
     }
   }, { passive: false });
 
@@ -259,7 +237,6 @@ function initMap() {
     var dy = a.clientY - b.clientY;
     return Math.sqrt(dx*dx + dy*dy);
   }
-
   function clamp() {
     var w = WORLD_W * scale;
     var h = WORLD_H * scale;
@@ -270,7 +247,6 @@ function initMap() {
     if (posY > 0) posY = 0;
     if (posY < minY) posY = minY;
   }
-
   function apply() {
     world.style.transformOrigin = '0 0';
     world.style.transform = 'translate(' + posX + 'px, ' + posY + 'px) scale(' + scale + ')';
@@ -284,16 +260,12 @@ function initMap() {
   var bar = document.getElementById('bottom-bar');
   var handle = document.getElementById('panel-handle');
   if (!bar || !handle) return;
-
   handle.addEventListener('click', function() {
     bar.classList.toggle('expanded');
     if (tg) tg.HapticFeedback?.impactOccurred('light');
   });
-
   var startY = 0;
-  handle.addEventListener('touchstart', function(e) {
-    startY = e.touches[0].clientY;
-  });
+  handle.addEventListener('touchstart', function(e) { startY = e.touches[0].clientY; });
   handle.addEventListener('touchend', function(e) {
     var endY = e.changedTouches[0].clientY;
     var diff = startY - endY;
@@ -303,7 +275,23 @@ function initMap() {
 })();
 
 // ============================================
-// ЗАГЛУШКИ ДЛЯ КНОПОК
+// ТУМБЛЕРЫ В ПРОФИЛЕ
+// ============================================
+(function initToggles() {
+  var sound = document.getElementById('toggle-sound');
+  var music = document.getElementById('toggle-music');
+  if (sound) sound.addEventListener('click', function() {
+    sound.classList.toggle('off');
+    sound.textContent = sound.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
+  });
+  if (music) music.addEventListener('click', function() {
+    music.classList.toggle('off');
+    music.textContent = music.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
+  });
+})();
+
+// ============================================
+// ЗАГЛУШКИ
 // ============================================
 window.openBase    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('База'); };
 window.openMine    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Рудник'); };
