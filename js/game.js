@@ -37,9 +37,45 @@ var currentProfile = {
   avatar: '',
   soundOn: true,
   musicOn: true,
-  soundVol: 100,
-  musicVol: 100
+  soundVol: 70,
+  musicVol: 40
 };
+
+// ============ МУЗЫКА ============
+var musicMenu = new Audio('sounds/music_menu.mp3');
+musicMenu.loop = true;
+musicMenu.volume = currentProfile.musicVol / 100;
+var musicStarted = false;
+
+function tryPlayMusic() {
+  if (!currentProfile.musicOn) return;
+  musicMenu.volume = currentProfile.musicVol / 100;
+  musicMenu.play().then(function() {
+    musicStarted = true;
+  }).catch(function(e) {
+    // Автоплей заблокирован — ждём первого тапа
+  });
+}
+
+// Запуск музыки после первого тапа (обход автоплея)
+function armMusicAutoStart() {
+  var startOnce = function() {
+    tryPlayMusic();
+    document.removeEventListener('click', startOnce);
+    document.removeEventListener('touchstart', startOnce);
+  };
+  document.addEventListener('click', startOnce);
+  document.addEventListener('touchstart', startOnce);
+}
+
+function updateMusic() {
+  musicMenu.volume = currentProfile.musicVol / 100;
+  if (currentProfile.musicOn) {
+    tryPlayMusic();
+  } else {
+    musicMenu.pause();
+  }
+}
 
 // ============ СБОРКА МИРА ============
 (function buildWorld() {
@@ -143,15 +179,17 @@ var loaderInterval = setInterval(function() {
     if (fill) fill.style.width = '100%';
     setTimeout(function() {
       document.getElementById('splash').className = 'hidden';
-      // Загружаем профиль из Firebase
       if (window.loadPlayer) window.loadPlayer();
       document.getElementById('menu').className = 'visible';
+      // Пытаемся включить музыку
+      tryPlayMusic();
+      armMusicAutoStart();
     }, 400);
   }
 }, 50);
 
 // ============================================
-// ПРИМЕНЕНИЕ ДАННЫХ ПРОФИЛЯ К UI
+// ПРИМЕНЕНИЕ ДАННЫХ ПРОФИЛЯ
 // ============================================
 window.applyProfileData = function(data) {
   if (!data) return;
@@ -163,15 +201,12 @@ window.applyProfileData = function(data) {
   if (typeof data.soundVol !== 'undefined') currentProfile.soundVol = data.soundVol;
   if (typeof data.musicVol !== 'undefined') currentProfile.musicVol = data.musicVol;
 
-  // Имя в игре
   var playerName = document.getElementById('player-name');
   if (playerName) playerName.textContent = currentProfile.name;
 
-  // Имя в профиле
   var nameInput = document.getElementById('profile-name-input');
   if (nameInput) nameInput.value = currentProfile.name;
 
-  // Аватар
   var avatarBig = document.getElementById('avatar-big-img');
   var avatarSmall = document.getElementById('avatar');
   if (currentProfile.avatar) {
@@ -179,7 +214,6 @@ window.applyProfileData = function(data) {
     if (avatarSmall) avatarSmall.src = currentProfile.avatar;
   }
 
-  // Тумблеры
   var soundToggle = document.getElementById('toggle-sound');
   var musicToggle = document.getElementById('toggle-music');
   if (soundToggle) {
@@ -191,13 +225,11 @@ window.applyProfileData = function(data) {
     musicToggle.classList.toggle('off', !currentProfile.musicOn);
   }
 
-  // Громкость
   var soundVolVal = document.getElementById('vol-sound-val');
   var musicVolVal = document.getElementById('vol-music-val');
   if (soundVolVal) soundVolVal.textContent = currentProfile.soundVol + '%';
   if (musicVolVal) musicVolVal.textContent = currentProfile.musicVol + '%';
 
-  // Ресурсы
   if (typeof data.metal !== 'undefined') {
     var metal = document.getElementById('metal');
     if (metal) metal.textContent = data.metal;
@@ -210,6 +242,9 @@ window.applyProfileData = function(data) {
     var stars = document.getElementById('stars');
     if (stars) stars.textContent = data.stars;
   }
+
+  // Обновляем музыку по новым настройкам
+  updateMusic();
 };
 
 // ============================================
@@ -217,7 +252,6 @@ window.applyProfileData = function(data) {
 // ============================================
 window.startGame = function() {
   var hasProfile = localStorage.getItem('profile_ready');
-
   if (!hasProfile) {
     if (tg) tg.HapticFeedback?.impactOccurred('medium');
     document.getElementById('menu').className = '';
@@ -225,7 +259,6 @@ window.startGame = function() {
     document.getElementById('profile-screen').className = 'visible';
     return;
   }
-
   openGame();
 };
 
@@ -239,10 +272,8 @@ function openGame() {
 function fillProfileFromTelegram() {
   if (!tg || !tg.initDataUnsafe || !tg.initDataUnsafe.user) return;
   var u = tg.initDataUnsafe.user;
-
   var nameField = document.getElementById('profile-name-input');
   var avatarBig = document.getElementById('avatar-big-img');
-
   if (nameField && !nameField.value) {
     nameField.value = (u.first_name || u.username || 'Адмирал').slice(0, 15);
   }
@@ -286,21 +317,17 @@ window.closeProfileScreen = function() {
       musicVol: currentProfile.musicVol
     };
 
-    // Показываем "СОХРАНЕНИЕ..."
     var oldText = saveBtn.textContent;
     saveBtn.textContent = 'СОХРАНЕНИЕ...';
 
-    // Сохраняем в Firebase
     if (window.savePlayer) {
       await window.savePlayer(dataToSave);
     }
 
-    // Сохраняем локально
     localStorage.setItem('profile_ready', '1');
     localStorage.setItem('player_name', dataToSave.name);
     localStorage.setItem('player_avatar', dataToSave.avatar);
 
-    // Применяем к UI
     currentProfile.name = dataToSave.name;
     currentProfile.avatar = dataToSave.avatar;
 
@@ -457,6 +484,7 @@ function initMap() {
     music.classList.toggle('off');
     music.textContent = music.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
     currentProfile.musicOn = !music.classList.contains('off');
+    updateMusic();
   });
 })();
 
@@ -478,12 +506,12 @@ window.uploadAvatar = function() {
   });
 })();
 
-// Громкость
 window.changeVolume = function(type, delta) {
   if (type === 'sound') {
     currentProfile.soundVol = Math.max(0, Math.min(100, currentProfile.soundVol + delta));
   } else {
     currentProfile.musicVol = Math.max(0, Math.min(100, currentProfile.musicVol + delta));
+    updateMusic();
   }
   var el = document.getElementById('vol-' + type + '-val');
   if (el) el.textContent = (type === 'sound' ? currentProfile.soundVol : currentProfile.musicVol) + '%';
