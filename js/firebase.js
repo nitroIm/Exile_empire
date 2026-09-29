@@ -10,32 +10,78 @@ const firebaseConfig = {
   appId: "1:465765692374:web:c6b984f3ba91ecc22c2a77"
 };
 
-let db;
+let db = null;
 try {
   const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
-} catch(e) {
-  console.log('Firebase init error:', e);
-}
+} catch(e) { console.log('Firebase init error:', e); }
 
+// ============ ID ИГРОКА ============
+window.getPlayerId = function() {
+  // Если в Telegram — берём настоящий ID
+  if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+    return 'tg_' + window.Telegram.WebApp.initDataUnsafe.user.id;
+  }
+  // Если в браузере (для теста) — фиксированный ID
+  let testId = localStorage.getItem('test_player_id');
+  if (!testId) {
+    testId = 'test_user_1';
+    localStorage.setItem('test_player_id', testId);
+  }
+  return testId;
+};
+
+// ============ ЗАГРУЗКА ИГРОКА ============
 window.loadPlayer = async function() {
-  if (!db) return;
+  if (!db) return null;
+  const playerId = window.getPlayerId();
   try {
-    const docRef = doc(db, 'players', 'test_user_1');
+    const docRef = doc(db, 'players', playerId);
     const snap = await getDoc(docRef);
+
     if (snap.exists()) {
-      const d = snap.data();
-      document.getElementById('metal').textContent = d.metal || 0;
-      document.getElementById('crystal').textContent = d.crystal || 0;
-      document.getElementById('stars').textContent = d.stars || 0;
+      const data = snap.data();
+      console.log('Игрок загружен:', data);
+      // Применяем данные к UI
+      if (window.applyProfileData) window.applyProfileData(data);
+      return data;
     } else {
-      await setDoc(docRef, { metal: 500, crystal: 200, stars: 0 });
-      document.getElementById('metal').textContent = 500;
-      document.getElementById('crystal').textContent = 200;
-      document.getElementById('stars').textContent = 0;
+      // Новый игрок
+      const newPlayer = {
+        name: (window.Telegram?.WebApp?.initDataUnsafe?.user?.first_name || 'Адмирал').slice(0, 15),
+        avatar: window.Telegram?.WebApp?.initDataUnsafe?.user?.photo_url || '',
+        soundOn: true,
+        musicOn: true,
+        soundVol: 100,
+        musicVol: 100,
+        metal: 500,
+        crystal: 200,
+        stars: 0,
+        rank: 'РЯДОВОЙ',
+        createdAt: new Date().toISOString()
+      };
+      await setDoc(docRef, newPlayer);
+      console.log('Создан новый игрок:', newPlayer);
+      if (window.applyProfileData) window.applyProfileData(newPlayer);
+      return newPlayer;
     }
   } catch(e) {
     console.log('Firebase load error:', e);
-    document.getElementById('metal').textContent = 'ERR';
+    return null;
+  }
+};
+
+// ============ СОХРАНЕНИЕ ИГРОКА ============
+window.savePlayer = async function(data) {
+  if (!db) return false;
+  const playerId = window.getPlayerId();
+  try {
+    const docRef = doc(db, 'players', playerId);
+    await setDoc(docRef, data, { merge: true });
+    console.log('Игрок сохранён:', data);
+    return true;
+  } catch(e) {
+    console.log('Firebase save error:', e);
+    return false;
   }
 };
