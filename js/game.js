@@ -49,25 +49,19 @@ musicMenu.preload = 'auto';
 var musicPlaying = false;
 
 function updateMusicVolume() {
-  var v = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
-  musicMenu.volume = v;
-  console.log('🔊 Volume set to', v);
+  musicMenu.volume = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
 }
 
 function startMenuMusic() {
   if (!currentProfile.musicOn) return;
-  // В игре музыка не должна играть
+  // В игре музыка НЕ должна играть
   if (document.getElementById('game').classList.contains('visible')) return;
 
   updateMusicVolume();
   var p = musicMenu.play();
   if (p !== undefined) {
-    p.then(function() {
-      musicPlaying = true;
-      console.log('🎵 Music playing');
-    }).catch(function(e) {
-      console.log('🎵 Autoplay blocked:', e.message);
-    });
+    p.then(function() { musicPlaying = true; })
+     .catch(function(e) { console.log('Autoplay blocked:', e.message); });
   }
 }
 
@@ -159,7 +153,7 @@ var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
 // ============================================
-// ЗАГРУЗЧИК → ЭКРАН «НАЖМИТЕ» → МЕНЮ
+// ЗАГРУЗЧИК → МЕНЮ + МУЗЫКА СРАЗУ
 // ============================================
 var loaderProgress = 0;
 var loaderStart = Date.now();
@@ -176,48 +170,26 @@ var loaderInterval = setInterval(function() {
   if (t >= 1) {
     clearInterval(loaderInterval);
     if (fill) fill.style.width = '100%';
-    setTimeout(showTapToStart, 400);
+    setTimeout(function() {
+      document.getElementById('splash').className = 'hidden';
+      document.getElementById('menu').className = 'visible';
+
+      // Пробуем стартовать музыку СРАЗУ
+      startMenuMusic();
+
+      // Страховка: если браузер заблокировал — по первому тапу
+      var startOnce = function() {
+        if (!musicPlaying) startMenuMusic();
+        document.removeEventListener('touchstart', startOnce);
+        document.removeEventListener('click', startOnce);
+      };
+      document.addEventListener('touchstart', startOnce);
+      document.addEventListener('click', startOnce);
+
+      if (window.loadPlayer) window.loadPlayer();
+    }, 400);
   }
 }, 50);
-
-// Показываем экран «НАЖМИТЕ»
-function showTapToStart() {
-  document.getElementById('splash').className = 'hidden';
-  document.getElementById('menu').className = 'visible';
-
-  // Создаём затемнение-подсказку
-  var overlay = document.createElement('div');
-  overlay.id = 'tap-overlay';
-  overlay.style.cssText = [
-    'position:fixed','inset:0','z-index:200',
-    'display:flex','align-items:center','justify-content:center',
-    'background:rgba(0,0,0,0.75)',
-    'color:#d4a020','font-size:22px','font-weight:bold',
-    'letter-spacing:4px','text-align:center',
-    'text-shadow:0 0 12px rgba(0,0,0,0.9)',
-    'font-family:Arial,sans-serif',
-    'cursor:pointer'
-  ].join(';');
-  overlay.innerHTML = 'НАЖМИТЕ<br>ЧТОБЫ НАЧАТЬ';
-  document.body.appendChild(overlay);
-
-  var onTap = function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    // Старт музыки + скрыть подсказку
-    startMenuMusic();
-    overlay.remove();
-    // Загружаем данные игрока
-    if (window.loadPlayer) window.loadPlayer();
-    // Убираем слушатели
-    document.removeEventListener('touchstart', onTap, true);
-    document.removeEventListener('click', onTap, true);
-  };
-
-  // Слушаем первый тап — на любом слое
-  document.addEventListener('touchstart', onTap, true);
-  document.addEventListener('click', onTap, true);
-}
 
 // ============================================
 // ПРИМЕНЕНИЕ ДАННЫХ ПРОФИЛЯ
@@ -278,7 +250,7 @@ window.applyProfileData = function(data) {
 };
 
 // ============================================
-// ПЕРЕХОДЫ
+// ПЕРЕХОДЫ МЕЖДУ ЭКРАНАМИ
 // ============================================
 window.startGame = function() {
   var hasProfile = localStorage.getItem('profile_ready');
@@ -287,13 +259,16 @@ window.startGame = function() {
     document.getElementById('menu').className = '';
     fillProfileFromTelegram();
     document.getElementById('profile-screen').className = 'visible';
+    // музыка продолжает играть
     return;
   }
   openGame();
 };
 
 function openGame() {
+  // ★ ОСТАНАВЛИВАЕМ МУЗЫКУ ПРИ ВХОДЕ В ИГРУ
   stopMenuMusic();
+
   document.getElementById('menu').className = '';
   document.getElementById('profile-screen').className = '';
   document.getElementById('game').className = 'visible';
@@ -308,7 +283,9 @@ function fillProfileFromTelegram() {
   if (nameField && !nameField.value) {
     nameField.value = (u.first_name || u.username || 'Адмирал').slice(0, 15);
   }
-  if (u.photo_url && avatarBig) avatarBig.src = u.photo_url;
+  if (u.photo_url && avatarBig) {
+    avatarBig.src = u.photo_url;
+  }
 }
 
 window.openProfileScreen = function() {
@@ -316,21 +293,24 @@ window.openProfileScreen = function() {
   document.getElementById('menu').className = '';
   fillProfileFromTelegram();
   document.getElementById('profile-screen').className = 'visible';
+  // музыка продолжает играть
 };
 
 window.closeProfileScreen = function() {
   if (tg) tg.HapticFeedback?.impactOccurred('light');
   document.getElementById('profile-screen').className = '';
   document.getElementById('menu').className = 'visible';
+  // Возвращаемся в меню — включаем музыку
   if (currentProfile.musicOn) startMenuMusic();
 };
 
 // ============================================
-// СОХРАНЕНИЕ
+// СОХРАНЕНИЕ ПРОФИЛЯ
 // ============================================
 (function initSave() {
   var saveBtn = document.getElementById('profile-save');
   if (!saveBtn) return;
+
   saveBtn.addEventListener('click', async function() {
     var nameInput = document.getElementById('profile-name-input');
     var avatarBig = document.getElementById('avatar-big-img');
@@ -349,7 +329,9 @@ window.closeProfileScreen = function() {
     var oldText = saveBtn.textContent;
     saveBtn.textContent = 'СОХРАНЕНИЕ...';
 
-    if (window.savePlayer) await window.savePlayer(dataToSave);
+    if (window.savePlayer) {
+      await window.savePlayer(dataToSave);
+    }
 
     localStorage.setItem('profile_ready', '1');
     localStorage.setItem('player_name', dataToSave.name);
@@ -364,10 +346,11 @@ window.closeProfileScreen = function() {
     if (avatarSmall && dataToSave.avatar) avatarSmall.src = dataToSave.avatar;
 
     if (tg) tg.HapticFeedback?.impactOccurred('medium');
+
     saveBtn.textContent = 'СОХРАНЕНО ✓';
     setTimeout(function() {
       saveBtn.textContent = oldText;
-      openGame();
+      openGame();  // openGame() остановит музыку
     }, 600);
   });
 })();
@@ -487,7 +470,7 @@ function initMap() {
 })();
 
 // ============================================
-// ПРОФИЛЬ: фильтр, тумблеры, аватар
+// ПРОФИЛЬ
 // ============================================
 (function initNameFilter() {
   var nameInput = document.getElementById('profile-name-input');
@@ -511,7 +494,10 @@ function initMap() {
     music.textContent = music.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
     currentProfile.musicOn = !music.classList.contains('off');
     if (currentProfile.musicOn) {
-      if (!document.getElementById('game').classList.contains('visible')) startMenuMusic();
+      // Включаем музыку только если не в игре
+      if (!document.getElementById('game').classList.contains('visible')) {
+        startMenuMusic();
+      }
     } else {
       stopMenuMusic();
     }
@@ -536,11 +522,7 @@ window.uploadAvatar = function() {
   });
 })();
 
-// ============================================
-// ГРОМКОСТЬ
-// ============================================
 window.changeVolume = function(type, delta) {
-  console.log('🎚 changeVolume:', type, delta);
   if (type === 'sound') {
     currentProfile.soundVol = Math.max(0, Math.min(100, currentProfile.soundVol + delta));
     var el = document.getElementById('vol-sound-val');
