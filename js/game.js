@@ -38,8 +38,41 @@ var currentProfile = {
   soundOn: true,
   musicOn: true,
   soundVol: 70,
-  musicVol: 40
+  musicVol: 40,
+  army: 0
 };
+
+// ============================================
+// ЗВАНИЯ (по числу армии)
+// ============================================
+var RANKS = [
+  { min: 0,      name: 'РЯДОВОЙ',           icon: 'ui/ranks/rank_01.PNG' },
+  { min: 10,     name: 'ЕФРЕЙТОР',          icon: 'ui/ranks/rank_02.PNG' },
+  { min: 20,     name: 'МЛАДШИЙ СЕРЖАНТ',   icon: 'ui/ranks/rank_03.PNG' },
+  { min: 50,     name: 'СЕРЖАНТ',           icon: 'ui/ranks/rank_04.PNG' },
+  { min: 100,    name: 'СТАРШИЙ СЕРЖАНТ',   icon: 'ui/ranks/rank_05.PNG' },
+  { min: 200,    name: 'СТАРШИНА',          icon: 'ui/ranks/rank_06.PNG' },
+  { min: 400,    name: 'ПРАПОРЩИК',         icon: 'ui/ranks/rank_07.PNG' },
+  { min: 700,    name: 'ЛЕЙТЕНАНТ',         icon: 'ui/ranks/rank_08.PNG' },
+  { min: 1000,   name: 'КАПИТАН',           icon: 'ui/ranks/rank_09.PNG' },
+  { min: 2000,   name: 'МАЙОР',             icon: 'ui/ranks/rank_10.PNG' }
+];
+
+function getRankByArmy(army) {
+  var result = RANKS[0];
+  for (var i = 0; i < RANKS.length; i++) {
+    if (army >= RANKS[i].min) result = RANKS[i];
+  }
+  return result;
+}
+
+function updateRankDisplay() {
+  var rank = getRankByArmy(currentProfile.army);
+  var nameEl = document.getElementById('player-rank-name');
+  var iconEl = document.getElementById('player-rank-icon');
+  if (nameEl) nameEl.textContent = rank.name;
+  if (iconEl) iconEl.src = rank.icon;
+}
 
 // ============================================
 // ЗВУКИ через HOWLER.JS
@@ -51,7 +84,7 @@ var musicMenu = new Howl({
   html5: false,
   preload: true,
   onload: function() { console.log('🎵 Музыка загружена'); },
-  onloaderror: function(id, e) { console.log('❌ Музыка не загрузилась:', e); },
+  onloaderror: function(id, e) { console.log('❌ Музыка:', e); },
   onplayerror: function(id, e) {
     console.log('❌ Ошибка воспроизведения:', e);
     musicMenu.once('unlock', function() { musicMenu.play(); });
@@ -64,53 +97,38 @@ var soundClick = new Howl({
   html5: false,
   preload: true,
   onload: function() { console.log('🖱 Клик загружен'); },
-  onloaderror: function(id, e) { console.log('❌ Клик не загрузился:', e); }
+  onloaderror: function(id, e) { console.log('❌ Клик:', e); }
 });
 
 function updateMusicVolume() {
   var v = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
   musicMenu.volume(v);
-  console.log('🔊 Музыка volume =', v);
 }
-
 function updateClickVolume() {
   var v = Math.max(0, Math.min(1, currentProfile.soundVol / 100));
   soundClick.volume(v);
 }
-
 function playClick() {
   if (!currentProfile.soundOn) return;
   updateClickVolume();
   soundClick.play();
 }
-
 function startMenuMusic() {
   if (!currentProfile.musicOn) return;
   if (document.getElementById('game').classList.contains('visible')) return;
   updateMusicVolume();
-  if (!musicMenu.playing()) {
-    musicMenu.play();
-  }
+  if (!musicMenu.playing()) musicMenu.play();
 }
-
 function stopMenuMusic() {
-  if (musicMenu.playing()) {
-    musicMenu.pause();
-  }
+  if (musicMenu.playing()) musicMenu.pause();
 }
 
-// Автопривязка клика ко всем кнопкам
+// Автопривязка клика
 function attachClickSounds() {
   var selectors = [
-    '.menu-btn',
-    '.bottom-btn',
-    '#profile-save',
-    '#profile-back',
-    '.vol-btn',
-    '.profile-toggle',
-    '.profile-mini-btn',
-    '#panel-handle',
-    '#profile-back-bottom'
+    '.menu-btn', '.bottom-btn', '#profile-save', '#profile-back',
+    '.vol-btn', '.profile-toggle', '.profile-mini-btn',
+    '#gear-btn', '.gear-menu-btn'
   ];
   selectors.forEach(function(sel) {
     document.querySelectorAll(sel).forEach(function(el) {
@@ -252,6 +270,7 @@ window.applyProfileData = function(data) {
   if (typeof data.musicOn !== 'undefined') currentProfile.musicOn = data.musicOn;
   if (typeof data.soundVol !== 'undefined') currentProfile.soundVol = data.soundVol;
   if (typeof data.musicVol !== 'undefined') currentProfile.musicVol = data.musicVol;
+  if (typeof data.army !== 'undefined') currentProfile.army = data.army;
 
   var playerName = document.getElementById('player-name');
   if (playerName) playerName.textContent = currentProfile.name;
@@ -294,9 +313,17 @@ window.applyProfileData = function(data) {
     var stars = document.getElementById('stars');
     if (stars) stars.textContent = data.stars;
   }
+  if (typeof data.energy !== 'undefined') {
+    var energy = document.getElementById('energy');
+    if (energy) energy.textContent = data.energy;
+  }
+
+  var armyEl = document.getElementById('army');
+  if (armyEl) armyEl.textContent = currentProfile.army;
 
   updateMusicVolume();
   updateClickVolume();
+  updateRankDisplay();
 };
 
 // ============================================
@@ -320,6 +347,7 @@ function openGame() {
   document.getElementById('profile-screen').className = '';
   document.getElementById('game').className = 'visible';
   initMap();
+  updateRankDisplay();
 }
 
 function fillProfileFromTelegram() {
@@ -374,9 +402,7 @@ window.closeProfileScreen = function() {
     var oldText = saveBtn.textContent;
     saveBtn.textContent = 'СОХРАНЕНИЕ...';
 
-    if (window.savePlayer) {
-      await window.savePlayer(dataToSave);
-    }
+    if (window.savePlayer) await window.savePlayer(dataToSave);
 
     localStorage.setItem('profile_ready', '1');
     localStorage.setItem('player_name', dataToSave.name);
@@ -494,27 +520,6 @@ function initMap() {
 }
 
 // ============================================
-// ВЫДВИЖНАЯ ПАНЕЛЬ
-// ============================================
-(function initPanel() {
-  var bar = document.getElementById('bottom-bar');
-  var handle = document.getElementById('panel-handle');
-  if (!bar || !handle) return;
-  handle.addEventListener('click', function() {
-    bar.classList.toggle('expanded');
-    if (tg) tg.HapticFeedback?.impactOccurred('light');
-  });
-  var startY = 0;
-  handle.addEventListener('touchstart', function(e) { startY = e.touches[0].clientY; });
-  handle.addEventListener('touchend', function(e) {
-    var endY = e.changedTouches[0].clientY;
-    var diff = startY - endY;
-    if (diff > 30) bar.classList.add('expanded');
-    if (diff < -30) bar.classList.remove('expanded');
-  });
-})();
-
-// ============================================
 // ПРОФИЛЬ
 // ============================================
 (function initNameFilter() {
@@ -585,65 +590,28 @@ window.changeVolume = function(type, delta) {
 };
 
 // ============================================
+// ФУНКЦИЯ ОБНОВЛЕНИЯ АРМИИ (для будущего)
+// ============================================
+window.setArmy = function(value) {
+  currentProfile.army = Math.max(0, value);
+  var armyEl = document.getElementById('army');
+  if (armyEl) armyEl.textContent = currentProfile.army;
+  updateRankDisplay();
+};
+
+window.addArmy = function(delta) {
+  window.setArmy(currentProfile.army + delta);
+};
+
+// ============================================
 // ЗАГЛУШКИ
 // ============================================
 window.openBase    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('База'); };
-window.openMine    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Рудник'); };
+window.openArmy    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Армия: ' + currentProfile.army); };
 window.openFight   = function() { if (tg) tg.HapticFeedback?.impactOccurred('medium'); alert('Бой'); };
 window.openMap     = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Карта'); };
 window.openShop    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Магазин'); };
-window.openArmy    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Армия'); };
 window.openScience = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Наука'); };
 window.openFleet   = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Флот'); };
 window.openClan    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Клан'); };
 window.openQuests  = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Задания'); };
-// ============================================
-// ШЕСТЕРЁНКА
-// ============================================
-window.openGearMenu = function() {
-  playClick();
-  document.getElementById('gear-menu').className = 'visible';
-};
-
-window.closeGearMenu = function() {
-  playClick();
-  document.getElementById('gear-menu').className = '';
-};
-
-window.gearSave = async function() {
-  playClick();
-  // Сохраняем профиль в Firebase
-  var dataToSave = {
-    name: currentProfile.name,
-    avatar: currentProfile.avatar,
-    soundOn: currentProfile.soundOn,
-    musicOn: currentProfile.musicOn,
-    soundVol: currentProfile.soundVol,
-    musicVol: currentProfile.musicVol
-  };
-  if (window.savePlayer) {
-    await window.savePlayer(dataToSave);
-  }
-  // Показываем "СОХРАНЕНО"
-  var btn = document.querySelector('.gear-menu-btn.save');
-  if (btn) {
-    var old = btn.textContent;
-    btn.textContent = 'СОХРАНЕНО ✓';
-    setTimeout(function() {
-      btn.textContent = old;
-      closeGearMenu();
-    }, 800);
-  }
-};
-
-window.gearExit = function() {
-  playClick();
-  closeGearMenu();
-  // Стоп музыка
-  stopMenuMusic();
-  // Показать меню
-  document.getElementById('game').className = '';
-  document.getElementById('menu').className = 'visible';
-  // Музыка меню
-  startMenuMusic();
-};
