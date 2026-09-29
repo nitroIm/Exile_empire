@@ -41,33 +41,43 @@ var currentProfile = {
   musicVol: 40
 };
 
-// ============ МУЗЫКА ============
-var musicMenu = new Audio('sounds/music_menu.mp3');
-musicMenu.loop = true;
-musicMenu.volume = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
-musicMenu.preload = 'auto';
-var musicPlaying = false;
+// ============================================
+// МУЗЫКА через HOWLER.JS
+// ============================================
+var musicMenu = new Howl({
+  src: ['sounds/music_menu.mp3'],
+  loop: true,
+  volume: 0.4,
+  html5: false,
+  preload: true,
+  onload: function() { console.log('🎵 Музыка загружена'); },
+  onloaderror: function(id, e) { console.log('❌ Ошибка загрузки музыки:', e); },
+  onplayerror: function(id, e) {
+    console.log('❌ Ошибка воспроизведения:', e);
+    musicMenu.once('unlock', function() { musicMenu.play(); });
+  }
+});
 
 function updateMusicVolume() {
-  musicMenu.volume = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
+  var v = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
+  musicMenu.volume(v);
+  console.log('🔊 Music volume =', v);
+  return v;
 }
 
 function startMenuMusic() {
   if (!currentProfile.musicOn) return;
-  // В игре музыка НЕ должна играть
   if (document.getElementById('game').classList.contains('visible')) return;
-
   updateMusicVolume();
-  var p = musicMenu.play();
-  if (p !== undefined) {
-    p.then(function() { musicPlaying = true; })
-     .catch(function(e) { console.log('Autoplay blocked:', e.message); });
+  if (!musicMenu.playing()) {
+    musicMenu.play();
   }
 }
 
 function stopMenuMusic() {
-  musicMenu.pause();
-  musicPlaying = false;
+  if (musicMenu.playing()) {
+    musicMenu.pause();
+  }
 }
 
 // ============ СБОРКА МИРА ============
@@ -153,7 +163,7 @@ var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
 // ============================================
-// ЗАГРУЗЧИК → МЕНЮ + МУЗЫКА СРАЗУ
+// ЗАГРУЗЧИК
 // ============================================
 var loaderProgress = 0;
 var loaderStart = Date.now();
@@ -174,12 +184,10 @@ var loaderInterval = setInterval(function() {
       document.getElementById('splash').className = 'hidden';
       document.getElementById('menu').className = 'visible';
 
-      // Пробуем стартовать музыку СРАЗУ
       startMenuMusic();
 
-      // Страховка: если браузер заблокировал — по первому тапу
       var startOnce = function() {
-        if (!musicPlaying) startMenuMusic();
+        startMenuMusic();
         document.removeEventListener('touchstart', startOnce);
         document.removeEventListener('click', startOnce);
       };
@@ -250,7 +258,7 @@ window.applyProfileData = function(data) {
 };
 
 // ============================================
-// ПЕРЕХОДЫ МЕЖДУ ЭКРАНАМИ
+// ПЕРЕХОДЫ
 // ============================================
 window.startGame = function() {
   var hasProfile = localStorage.getItem('profile_ready');
@@ -259,16 +267,13 @@ window.startGame = function() {
     document.getElementById('menu').className = '';
     fillProfileFromTelegram();
     document.getElementById('profile-screen').className = 'visible';
-    // музыка продолжает играть
     return;
   }
   openGame();
 };
 
 function openGame() {
-  // ★ ОСТАНАВЛИВАЕМ МУЗЫКУ ПРИ ВХОДЕ В ИГРУ
   stopMenuMusic();
-
   document.getElementById('menu').className = '';
   document.getElementById('profile-screen').className = '';
   document.getElementById('game').className = 'visible';
@@ -293,14 +298,12 @@ window.openProfileScreen = function() {
   document.getElementById('menu').className = '';
   fillProfileFromTelegram();
   document.getElementById('profile-screen').className = 'visible';
-  // музыка продолжает играть
 };
 
 window.closeProfileScreen = function() {
   if (tg) tg.HapticFeedback?.impactOccurred('light');
   document.getElementById('profile-screen').className = '';
   document.getElementById('menu').className = 'visible';
-  // Возвращаемся в меню — включаем музыку
   if (currentProfile.musicOn) startMenuMusic();
 };
 
@@ -350,7 +353,7 @@ window.closeProfileScreen = function() {
     saveBtn.textContent = 'СОХРАНЕНО ✓';
     setTimeout(function() {
       saveBtn.textContent = oldText;
-      openGame();  // openGame() остановит музыку
+      openGame();
     }, 600);
   });
 })();
@@ -494,7 +497,6 @@ function initMap() {
     music.textContent = music.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
     currentProfile.musicOn = !music.classList.contains('off');
     if (currentProfile.musicOn) {
-      // Включаем музыку только если не в игре
       if (!document.getElementById('game').classList.contains('visible')) {
         startMenuMusic();
       }
@@ -522,6 +524,9 @@ window.uploadAvatar = function() {
   });
 })();
 
+// ============================================
+// ГРОМКОСТЬ — Howler.js
+// ============================================
 window.changeVolume = function(type, delta) {
   if (type === 'sound') {
     currentProfile.soundVol = Math.max(0, Math.min(100, currentProfile.soundVol + delta));
