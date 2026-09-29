@@ -31,6 +31,16 @@ var hero = {
   moving: false, dir: 'up'
 };
 
+// ============ ТЕКУЩИЕ ДАННЫЕ ПРОФИЛЯ ============
+var currentProfile = {
+  name: 'АДМИРАЛ',
+  avatar: '',
+  soundOn: true,
+  musicOn: true,
+  soundVol: 100,
+  musicVol: 100
+};
+
 // ============ СБОРКА МИРА ============
 (function buildWorld() {
   var world = document.getElementById('world');
@@ -133,24 +143,118 @@ var loaderInterval = setInterval(function() {
     if (fill) fill.style.width = '100%';
     setTimeout(function() {
       document.getElementById('splash').className = 'hidden';
+      // Загружаем профиль из Firebase
+      if (window.loadPlayer) window.loadPlayer();
       document.getElementById('menu').className = 'visible';
     }, 400);
   }
 }, 50);
 
 // ============================================
+// ПРИМЕНЕНИЕ ДАННЫХ ПРОФИЛЯ К UI
+// ============================================
+window.applyProfileData = function(data) {
+  if (!data) return;
+
+  if (data.name) currentProfile.name = data.name;
+  if (data.avatar) currentProfile.avatar = data.avatar;
+  if (typeof data.soundOn !== 'undefined') currentProfile.soundOn = data.soundOn;
+  if (typeof data.musicOn !== 'undefined') currentProfile.musicOn = data.musicOn;
+  if (typeof data.soundVol !== 'undefined') currentProfile.soundVol = data.soundVol;
+  if (typeof data.musicVol !== 'undefined') currentProfile.musicVol = data.musicVol;
+
+  // Имя в игре
+  var playerName = document.getElementById('player-name');
+  if (playerName) playerName.textContent = currentProfile.name;
+
+  // Имя в профиле
+  var nameInput = document.getElementById('profile-name-input');
+  if (nameInput) nameInput.value = currentProfile.name;
+
+  // Аватар
+  var avatarBig = document.getElementById('avatar-big-img');
+  var avatarSmall = document.getElementById('avatar');
+  if (currentProfile.avatar) {
+    if (avatarBig) avatarBig.src = currentProfile.avatar;
+    if (avatarSmall) avatarSmall.src = currentProfile.avatar;
+  }
+
+  // Тумблеры
+  var soundToggle = document.getElementById('toggle-sound');
+  var musicToggle = document.getElementById('toggle-music');
+  if (soundToggle) {
+    soundToggle.textContent = currentProfile.soundOn ? 'ВКЛ' : 'ВЫКЛ';
+    soundToggle.classList.toggle('off', !currentProfile.soundOn);
+  }
+  if (musicToggle) {
+    musicToggle.textContent = currentProfile.musicOn ? 'ВКЛ' : 'ВЫКЛ';
+    musicToggle.classList.toggle('off', !currentProfile.musicOn);
+  }
+
+  // Громкость
+  var soundVolVal = document.getElementById('vol-sound-val');
+  var musicVolVal = document.getElementById('vol-music-val');
+  if (soundVolVal) soundVolVal.textContent = currentProfile.soundVol + '%';
+  if (musicVolVal) musicVolVal.textContent = currentProfile.musicVol + '%';
+
+  // Ресурсы
+  if (typeof data.metal !== 'undefined') {
+    var metal = document.getElementById('metal');
+    if (metal) metal.textContent = data.metal;
+  }
+  if (typeof data.crystal !== 'undefined') {
+    var crystal = document.getElementById('crystal');
+    if (crystal) crystal.textContent = data.crystal;
+  }
+  if (typeof data.stars !== 'undefined') {
+    var stars = document.getElementById('stars');
+    if (stars) stars.textContent = data.stars;
+  }
+};
+
+// ============================================
 // ПЕРЕХОДЫ МЕЖДУ ЭКРАНАМИ
 // ============================================
 window.startGame = function() {
+  var hasProfile = localStorage.getItem('profile_ready');
+
+  if (!hasProfile) {
+    if (tg) tg.HapticFeedback?.impactOccurred('medium');
+    document.getElementById('menu').className = '';
+    fillProfileFromTelegram();
+    document.getElementById('profile-screen').className = 'visible';
+    return;
+  }
+
+  openGame();
+};
+
+function openGame() {
   document.getElementById('menu').className = '';
+  document.getElementById('profile-screen').className = '';
   document.getElementById('game').className = 'visible';
   initMap();
-  if (window.loadPlayer) window.loadPlayer();
-};
+}
+
+function fillProfileFromTelegram() {
+  if (!tg || !tg.initDataUnsafe || !tg.initDataUnsafe.user) return;
+  var u = tg.initDataUnsafe.user;
+
+  var nameField = document.getElementById('profile-name-input');
+  var avatarBig = document.getElementById('avatar-big-img');
+
+  if (nameField && !nameField.value) {
+    nameField.value = (u.first_name || u.username || 'Адмирал').slice(0, 15);
+  }
+  if (u.photo_url && avatarBig) {
+    avatarBig.src = u.photo_url;
+  }
+}
 
 window.openProfileScreen = function() {
   if (tg) tg.HapticFeedback?.impactOccurred('light');
   document.getElementById('menu').className = '';
+  fillProfileFromTelegram();
   document.getElementById('profile-screen').className = 'visible';
 };
 
@@ -159,6 +263,61 @@ window.closeProfileScreen = function() {
   document.getElementById('profile-screen').className = '';
   document.getElementById('menu').className = 'visible';
 };
+
+// ============================================
+// СОХРАНЕНИЕ ПРОФИЛЯ
+// ============================================
+(function initSave() {
+  var saveBtn = document.getElementById('profile-save');
+  if (!saveBtn) return;
+
+  saveBtn.addEventListener('click', async function() {
+    var nameInput = document.getElementById('profile-name-input');
+    var avatarBig = document.getElementById('avatar-big-img');
+    var soundToggle = document.getElementById('toggle-sound');
+    var musicToggle = document.getElementById('toggle-music');
+
+    var dataToSave = {
+      name: nameInput ? (nameInput.value || 'Адмирал') : 'Адмирал',
+      avatar: avatarBig ? avatarBig.src : '',
+      soundOn: !soundToggle?.classList.contains('off'),
+      musicOn: !musicToggle?.classList.contains('off'),
+      soundVol: currentProfile.soundVol,
+      musicVol: currentProfile.musicVol
+    };
+
+    // Показываем "СОХРАНЕНИЕ..."
+    var oldText = saveBtn.textContent;
+    saveBtn.textContent = 'СОХРАНЕНИЕ...';
+
+    // Сохраняем в Firebase
+    if (window.savePlayer) {
+      await window.savePlayer(dataToSave);
+    }
+
+    // Сохраняем локально
+    localStorage.setItem('profile_ready', '1');
+    localStorage.setItem('player_name', dataToSave.name);
+    localStorage.setItem('player_avatar', dataToSave.avatar);
+
+    // Применяем к UI
+    currentProfile.name = dataToSave.name;
+    currentProfile.avatar = dataToSave.avatar;
+
+    var playerName = document.getElementById('player-name');
+    var avatarSmall = document.getElementById('avatar');
+    if (playerName) playerName.textContent = dataToSave.name;
+    if (avatarSmall && dataToSave.avatar) avatarSmall.src = dataToSave.avatar;
+
+    if (tg) tg.HapticFeedback?.impactOccurred('medium');
+
+    saveBtn.textContent = 'СОХРАНЕНО ✓';
+    setTimeout(function() {
+      saveBtn.textContent = oldText;
+      openGame();
+    }, 600);
+  });
+})();
 
 // ============================================
 // СВАЙП + ЗУМ + ТАП
@@ -275,20 +434,61 @@ function initMap() {
 })();
 
 // ============================================
-// ТУМБЛЕРЫ В ПРОФИЛЕ
+// ПРОФИЛЬ: фильтр, тумблеры, аватар, громкость
 // ============================================
+(function initNameFilter() {
+  var nameInput = document.getElementById('profile-name-input');
+  if (!nameInput) return;
+  nameInput.addEventListener('input', function() {
+    this.value = this.value.replace(/[^A-Za-zА-Яа-яЁё ]/g, '');
+    if (this.value.length > 15) this.value = this.value.slice(0, 15);
+  });
+})();
+
 (function initToggles() {
   var sound = document.getElementById('toggle-sound');
   var music = document.getElementById('toggle-music');
   if (sound) sound.addEventListener('click', function() {
     sound.classList.toggle('off');
     sound.textContent = sound.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
+    currentProfile.soundOn = !sound.classList.contains('off');
   });
   if (music) music.addEventListener('click', function() {
     music.classList.toggle('off');
     music.textContent = music.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
+    currentProfile.musicOn = !music.classList.contains('off');
   });
 })();
+
+window.uploadAvatar = function() {
+  document.getElementById('avatar-file').click();
+};
+(function initUpload() {
+  var fileInput = document.getElementById('avatar-file');
+  if (!fileInput) return;
+  fileInput.addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      document.getElementById('avatar-big-img').src = ev.target.result;
+      currentProfile.avatar = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+})();
+
+// Громкость
+window.changeVolume = function(type, delta) {
+  if (type === 'sound') {
+    currentProfile.soundVol = Math.max(0, Math.min(100, currentProfile.soundVol + delta));
+  } else {
+    currentProfile.musicVol = Math.max(0, Math.min(100, currentProfile.musicVol + delta));
+  }
+  var el = document.getElementById('vol-' + type + '-val');
+  if (el) el.textContent = (type === 'sound' ? currentProfile.soundVol : currentProfile.musicVol) + '%';
+  if (tg) tg.HapticFeedback?.impactOccurred('light');
+};
 
 // ============================================
 // ЗАГЛУШКИ
