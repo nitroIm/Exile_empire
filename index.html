@@ -27,7 +27,6 @@
   </div>
 </div>
 
-<!-- ЭКРАН ПРОФИЛЯ -->
 <div id="profile-screen">
   <img class="bg" src="assets/Planet.PNG" alt="bg">
   <div class="dark"></div>
@@ -39,29 +38,49 @@
       <div id="profile-title">ПРОФИЛЬ</div>
 
       <div id="profile-avatar-big">
-        <img src="ui/avatar_default.PNG" alt="">
+        <img id="avatar-big-img" src="ui/avatar_default.PNG" alt="">
       </div>
+
+      <div class="profile-avatar-buttons">
+        <div class="profile-mini-btn" onclick="uploadAvatar()">ЗАГРУЗИТЬ ФОТО</div>
+      </div>
+      <input type="file" id="avatar-file" accept="image/*" style="display:none">
 
       <div class="profile-row">
         <div class="profile-label">ИМЯ</div>
-        <input id="profile-name-input" type="text" placeholder="Введите имя">
+        <input id="profile-name-input" type="text" maxlength="15" placeholder="Введите имя">
       </div>
 
-      <div class="profile-row">
-        <div class="profile-label">ЗВУК</div>
-        <div class="profile-toggle" id="toggle-sound">ВКЛ</div>
+      <!-- ЗВУК -->
+      <div class="profile-row profile-row-double">
+        <div class="profile-row-top">
+          <div class="profile-label">ЗВУК</div>
+          <div class="profile-toggle" id="toggle-sound">ВКЛ</div>
+        </div>
+        <div class="profile-volume">
+          <div class="vol-btn" onclick="changeVolume('sound', -10)">−</div>
+          <div class="vol-value" id="vol-sound-val">100%</div>
+          <div class="vol-btn" onclick="changeVolume('sound', 10)">+</div>
+        </div>
       </div>
 
-      <div class="profile-row">
-        <div class="profile-label">МУЗЫКА</div>
-        <div class="profile-toggle" id="toggle-music">ВКЛ</div>
+      <!-- МУЗЫКА -->
+      <div class="profile-row profile-row-double">
+        <div class="profile-row-top">
+          <div class="profile-label">МУЗЫКА</div>
+          <div class="profile-toggle" id="toggle-music">ВКЛ</div>
+        </div>
+        <div class="profile-volume">
+          <div class="vol-btn" onclick="changeVolume('music', -10)">−</div>
+          <div class="vol-value" id="vol-music-val">100%</div>
+          <div class="vol-btn" onclick="changeVolume('music', 10)">+</div>
+        </div>
       </div>
 
       <div id="profile-save">СОХРАНИТЬ</div>
+      <div id="profile-back" onclick="closeProfileScreen()">← НАЗАД</div>
     </div>
   </div>
-
-  <div id="profile-back" onclick="closeProfileScreen()">← НАЗАД</div>
 </div>
 
 <div id="game">
