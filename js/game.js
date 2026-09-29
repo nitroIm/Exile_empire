@@ -45,36 +45,32 @@ var currentProfile = {
 var musicMenu = new Audio('sounds/music_menu.mp3');
 musicMenu.loop = true;
 musicMenu.volume = currentProfile.musicVol / 100;
+musicMenu.preload = 'auto';
 var musicStarted = false;
 
-function tryPlayMusic() {
-  if (!currentProfile.musicOn) return;
-  musicMenu.volume = currentProfile.musicVol / 100;
-  musicMenu.play().then(function() {
-    musicStarted = true;
-  }).catch(function(e) {
-    // Автоплей заблокирован — ждём первого тапа
-  });
+function updateMusicVolume() {
+  musicMenu.volume = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
 }
 
-// Запуск музыки после первого тапа (обход автоплея)
+function startMenuMusic() {
+  if (!currentProfile.musicOn) return;
+  updateMusicVolume();
+  var p = musicMenu.play();
+  if (p !== undefined) {
+    p.then(function() { musicStarted = true; })
+     .catch(function(e) { console.log('Music autoplay blocked:', e); });
+  }
+}
+
+// Обход блокировки автоплея — старт по первому тапу
 function armMusicAutoStart() {
   var startOnce = function() {
-    tryPlayMusic();
+    startMenuMusic();
     document.removeEventListener('click', startOnce);
     document.removeEventListener('touchstart', startOnce);
   };
   document.addEventListener('click', startOnce);
   document.addEventListener('touchstart', startOnce);
-}
-
-function updateMusic() {
-  musicMenu.volume = currentProfile.musicVol / 100;
-  if (currentProfile.musicOn) {
-    tryPlayMusic();
-  } else {
-    musicMenu.pause();
-  }
 }
 
 // ============ СБОРКА МИРА ============
@@ -160,7 +156,7 @@ var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
 // ============================================
-// ЗАГРУЗЧИК
+// ЗАГРУЗЧИК → МЕНЮ → МУЗЫКА
 // ============================================
 var loaderProgress = 0;
 var loaderStart = Date.now();
@@ -178,12 +174,16 @@ var loaderInterval = setInterval(function() {
     clearInterval(loaderInterval);
     if (fill) fill.style.width = '100%';
     setTimeout(function() {
+      // Прячем заставку → показываем меню → запускаем музыку
       document.getElementById('splash').className = 'hidden';
-      if (window.loadPlayer) window.loadPlayer();
       document.getElementById('menu').className = 'visible';
-      // Пытаемся включить музыку
-      tryPlayMusic();
+
+      // Пытаемся запустить музыку сразу
+      startMenuMusic();
+      // И страхуемся первым тапом (если браузер блокирует автоплей)
       armMusicAutoStart();
+
+      if (window.loadPlayer) window.loadPlayer();
     }, 400);
   }
 }, 50);
@@ -243,8 +243,10 @@ window.applyProfileData = function(data) {
     if (stars) stars.textContent = data.stars;
   }
 
-  // Обновляем музыку по новым настройкам
-  updateMusic();
+  // Обновляем громкость музыки под загруженные настройки
+  updateMusicVolume();
+  if (currentProfile.musicOn && !musicStarted) startMenuMusic();
+  if (!currentProfile.musicOn) musicMenu.pause();
 };
 
 // ============================================
@@ -484,7 +486,11 @@ function initMap() {
     music.classList.toggle('off');
     music.textContent = music.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
     currentProfile.musicOn = !music.classList.contains('off');
-    updateMusic();
+    if (currentProfile.musicOn) {
+      startMenuMusic();
+    } else {
+      musicMenu.pause();
+    }
   });
 })();
 
@@ -506,15 +512,21 @@ window.uploadAvatar = function() {
   });
 })();
 
+// ============================================
+// ГРОМКОСТЬ — работает в реальном времени
+// ============================================
 window.changeVolume = function(type, delta) {
   if (type === 'sound') {
     currentProfile.soundVol = Math.max(0, Math.min(100, currentProfile.soundVol + delta));
+    var el = document.getElementById('vol-sound-val');
+    if (el) el.textContent = currentProfile.soundVol + '%';
   } else {
     currentProfile.musicVol = Math.max(0, Math.min(100, currentProfile.musicVol + delta));
-    updateMusic();
+    var el2 = document.getElementById('vol-music-val');
+    if (el2) el2.textContent = currentProfile.musicVol + '%';
+    // Сразу применяем к музыке
+    updateMusicVolume();
   }
-  var el = document.getElementById('vol-' + type + '-val');
-  if (el) el.textContent = (type === 'sound' ? currentProfile.soundVol : currentProfile.musicVol) + '%';
   if (tg) tg.HapticFeedback?.impactOccurred('light');
 };
 
