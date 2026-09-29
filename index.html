@@ -85,7 +85,6 @@
 <div id="game">
   <div id="world"></div>
 
-  <!-- ВЕРХНЯЯ ПАНЕЛЬ: ПРОФИЛЬ + РЕСУРСЫ + АРМИЯ -->
   <div id="top-bar">
     <div id="profile">
       <img class="frame" src="ui/profile_frame.PNG" alt="">
@@ -98,23 +97,40 @@
     <div id="right-panel">
       <div id="resource-chips">
         <div class="chip">
-          <div class="chip-icon chip-icon-metal"></div>
+          <img class="chip-icon" src="ui/icon_metal.PNG" alt="">
           <span id="metal">500</span>
         </div>
         <div class="chip">
-          <div class="chip-icon chip-icon-crystal"></div>
+          <img class="chip-icon" src="ui/icon_crystal.PNG" alt="">
           <span id="crystal">200</span>
         </div>
         <div class="chip">
-          <div class="chip-icon chip-icon-energy"></div>
+          <img class="chip-icon" src="ui/icon_energy.PNG" alt="">
           <span id="energy">100</span>
         </div>
       </div>
 
       <div id="army-bar">
-        <div class="army-icon"></div>
+        <img class="army-icon" src="ui/icon_army.PNG" alt="">
         <span id="army">0</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ШЕСТЕРЁНКА -->
+  <div id="gear-btn" onclick="openGearMenu()">
+    <img src="ui/icon_gear.PNG" alt="gear">
+  </div>
+
+  <!-- МЕНЮ ШЕСТЕРЁНКИ -->
+  <div id="gear-menu">
+    <img class="bg" src="assets/Planet.PNG" alt="">
+    <div class="dark"></div>
+    <div id="gear-menu-content">
+      <div id="gear-menu-title">МЕНЮ</div>
+      <div class="gear-menu-btn save" onclick="gearSave()">СОХРАНИТЬ</div>
+      <div class="gear-menu-btn exit" onclick="gearExit()">ВЫЙТИ В МЕНЮ</div>
+      <div class="gear-menu-btn cancel" onclick="closeGearMenu()">ОТМЕНА</div>
     </div>
   </div>
 
