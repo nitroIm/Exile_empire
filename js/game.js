@@ -31,7 +31,7 @@ var hero = {
   moving: false, dir: 'up'
 };
 
-// ============ ТЕКУЩИЕ ДАННЫЕ ПРОФИЛЯ ============
+// ============ ПРОФИЛЬ ============
 var currentProfile = {
   name: 'АДМИРАЛ',
   avatar: '',
@@ -44,33 +44,36 @@ var currentProfile = {
 // ============ МУЗЫКА ============
 var musicMenu = new Audio('sounds/music_menu.mp3');
 musicMenu.loop = true;
-musicMenu.volume = currentProfile.musicVol / 100;
+musicMenu.volume = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
 musicMenu.preload = 'auto';
-var musicStarted = false;
+var musicPlaying = false;
 
 function updateMusicVolume() {
-  musicMenu.volume = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
+  var v = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
+  musicMenu.volume = v;
+  console.log('🔊 Volume set to', v);
 }
 
 function startMenuMusic() {
   if (!currentProfile.musicOn) return;
+  // В игре музыка не должна играть
+  if (document.getElementById('game').classList.contains('visible')) return;
+
   updateMusicVolume();
   var p = musicMenu.play();
   if (p !== undefined) {
-    p.then(function() { musicStarted = true; })
-     .catch(function(e) { console.log('Music autoplay blocked:', e); });
+    p.then(function() {
+      musicPlaying = true;
+      console.log('🎵 Music playing');
+    }).catch(function(e) {
+      console.log('🎵 Autoplay blocked:', e.message);
+    });
   }
 }
 
-// Обход блокировки автоплея — старт по первому тапу
-function armMusicAutoStart() {
-  var startOnce = function() {
-    startMenuMusic();
-    document.removeEventListener('click', startOnce);
-    document.removeEventListener('touchstart', startOnce);
-  };
-  document.addEventListener('click', startOnce);
-  document.addEventListener('touchstart', startOnce);
+function stopMenuMusic() {
+  musicMenu.pause();
+  musicPlaying = false;
 }
 
 // ============ СБОРКА МИРА ============
@@ -156,7 +159,7 @@ var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
 // ============================================
-// ЗАГРУЗЧИК → МЕНЮ → МУЗЫКА
+// ЗАГРУЗЧИК → ЭКРАН «НАЖМИТЕ» → МЕНЮ
 // ============================================
 var loaderProgress = 0;
 var loaderStart = Date.now();
@@ -173,20 +176,48 @@ var loaderInterval = setInterval(function() {
   if (t >= 1) {
     clearInterval(loaderInterval);
     if (fill) fill.style.width = '100%';
-    setTimeout(function() {
-      // Прячем заставку → показываем меню → запускаем музыку
-      document.getElementById('splash').className = 'hidden';
-      document.getElementById('menu').className = 'visible';
-
-      // Пытаемся запустить музыку сразу
-      startMenuMusic();
-      // И страхуемся первым тапом (если браузер блокирует автоплей)
-      armMusicAutoStart();
-
-      if (window.loadPlayer) window.loadPlayer();
-    }, 400);
+    setTimeout(showTapToStart, 400);
   }
 }, 50);
+
+// Показываем экран «НАЖМИТЕ»
+function showTapToStart() {
+  document.getElementById('splash').className = 'hidden';
+  document.getElementById('menu').className = 'visible';
+
+  // Создаём затемнение-подсказку
+  var overlay = document.createElement('div');
+  overlay.id = 'tap-overlay';
+  overlay.style.cssText = [
+    'position:fixed','inset:0','z-index:200',
+    'display:flex','align-items:center','justify-content:center',
+    'background:rgba(0,0,0,0.75)',
+    'color:#d4a020','font-size:22px','font-weight:bold',
+    'letter-spacing:4px','text-align:center',
+    'text-shadow:0 0 12px rgba(0,0,0,0.9)',
+    'font-family:Arial,sans-serif',
+    'cursor:pointer'
+  ].join(';');
+  overlay.innerHTML = 'НАЖМИТЕ<br>ЧТОБЫ НАЧАТЬ';
+  document.body.appendChild(overlay);
+
+  var onTap = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    // Старт музыки + скрыть подсказку
+    startMenuMusic();
+    overlay.remove();
+    // Загружаем данные игрока
+    if (window.loadPlayer) window.loadPlayer();
+    // Убираем слушатели
+    document.removeEventListener('touchstart', onTap, true);
+    document.removeEventListener('click', onTap, true);
+  };
+
+  // Слушаем первый тап — на любом слое
+  document.addEventListener('touchstart', onTap, true);
+  document.addEventListener('click', onTap, true);
+}
 
 // ============================================
 // ПРИМЕНЕНИЕ ДАННЫХ ПРОФИЛЯ
@@ -243,14 +274,11 @@ window.applyProfileData = function(data) {
     if (stars) stars.textContent = data.stars;
   }
 
-  // Обновляем громкость музыки под загруженные настройки
   updateMusicVolume();
-  if (currentProfile.musicOn && !musicStarted) startMenuMusic();
-  if (!currentProfile.musicOn) musicMenu.pause();
 };
 
 // ============================================
-// ПЕРЕХОДЫ МЕЖДУ ЭКРАНАМИ
+// ПЕРЕХОДЫ
 // ============================================
 window.startGame = function() {
   var hasProfile = localStorage.getItem('profile_ready');
@@ -265,6 +293,7 @@ window.startGame = function() {
 };
 
 function openGame() {
+  stopMenuMusic();
   document.getElementById('menu').className = '';
   document.getElementById('profile-screen').className = '';
   document.getElementById('game').className = 'visible';
@@ -279,9 +308,7 @@ function fillProfileFromTelegram() {
   if (nameField && !nameField.value) {
     nameField.value = (u.first_name || u.username || 'Адмирал').slice(0, 15);
   }
-  if (u.photo_url && avatarBig) {
-    avatarBig.src = u.photo_url;
-  }
+  if (u.photo_url && avatarBig) avatarBig.src = u.photo_url;
 }
 
 window.openProfileScreen = function() {
@@ -295,15 +322,15 @@ window.closeProfileScreen = function() {
   if (tg) tg.HapticFeedback?.impactOccurred('light');
   document.getElementById('profile-screen').className = '';
   document.getElementById('menu').className = 'visible';
+  if (currentProfile.musicOn) startMenuMusic();
 };
 
 // ============================================
-// СОХРАНЕНИЕ ПРОФИЛЯ
+// СОХРАНЕНИЕ
 // ============================================
 (function initSave() {
   var saveBtn = document.getElementById('profile-save');
   if (!saveBtn) return;
-
   saveBtn.addEventListener('click', async function() {
     var nameInput = document.getElementById('profile-name-input');
     var avatarBig = document.getElementById('avatar-big-img');
@@ -322,9 +349,7 @@ window.closeProfileScreen = function() {
     var oldText = saveBtn.textContent;
     saveBtn.textContent = 'СОХРАНЕНИЕ...';
 
-    if (window.savePlayer) {
-      await window.savePlayer(dataToSave);
-    }
+    if (window.savePlayer) await window.savePlayer(dataToSave);
 
     localStorage.setItem('profile_ready', '1');
     localStorage.setItem('player_name', dataToSave.name);
@@ -339,7 +364,6 @@ window.closeProfileScreen = function() {
     if (avatarSmall && dataToSave.avatar) avatarSmall.src = dataToSave.avatar;
 
     if (tg) tg.HapticFeedback?.impactOccurred('medium');
-
     saveBtn.textContent = 'СОХРАНЕНО ✓';
     setTimeout(function() {
       saveBtn.textContent = oldText;
@@ -463,7 +487,7 @@ function initMap() {
 })();
 
 // ============================================
-// ПРОФИЛЬ: фильтр, тумблеры, аватар, громкость
+// ПРОФИЛЬ: фильтр, тумблеры, аватар
 // ============================================
 (function initNameFilter() {
   var nameInput = document.getElementById('profile-name-input');
@@ -487,9 +511,9 @@ function initMap() {
     music.textContent = music.classList.contains('off') ? 'ВЫКЛ' : 'ВКЛ';
     currentProfile.musicOn = !music.classList.contains('off');
     if (currentProfile.musicOn) {
-      startMenuMusic();
+      if (!document.getElementById('game').classList.contains('visible')) startMenuMusic();
     } else {
-      musicMenu.pause();
+      stopMenuMusic();
     }
   });
 })();
@@ -513,9 +537,10 @@ window.uploadAvatar = function() {
 })();
 
 // ============================================
-// ГРОМКОСТЬ — работает в реальном времени
+// ГРОМКОСТЬ
 // ============================================
 window.changeVolume = function(type, delta) {
+  console.log('🎚 changeVolume:', type, delta);
   if (type === 'sound') {
     currentProfile.soundVol = Math.max(0, Math.min(100, currentProfile.soundVol + delta));
     var el = document.getElementById('vol-sound-val');
@@ -524,7 +549,6 @@ window.changeVolume = function(type, delta) {
     currentProfile.musicVol = Math.max(0, Math.min(100, currentProfile.musicVol + delta));
     var el2 = document.getElementById('vol-music-val');
     if (el2) el2.textContent = currentProfile.musicVol + '%';
-    // Сразу применяем к музыке
     updateMusicVolume();
   }
   if (tg) tg.HapticFeedback?.impactOccurred('light');
