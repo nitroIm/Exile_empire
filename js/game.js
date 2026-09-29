@@ -597,3 +597,53 @@ window.openScience = function() { if (tg) tg.HapticFeedback?.impactOccurred('lig
 window.openFleet   = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Флот'); };
 window.openClan    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Клан'); };
 window.openQuests  = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Задания'); };
+// ============================================
+// ШЕСТЕРЁНКА
+// ============================================
+window.openGearMenu = function() {
+  playClick();
+  document.getElementById('gear-menu').className = 'visible';
+};
+
+window.closeGearMenu = function() {
+  playClick();
+  document.getElementById('gear-menu').className = '';
+};
+
+window.gearSave = async function() {
+  playClick();
+  // Сохраняем профиль в Firebase
+  var dataToSave = {
+    name: currentProfile.name,
+    avatar: currentProfile.avatar,
+    soundOn: currentProfile.soundOn,
+    musicOn: currentProfile.musicOn,
+    soundVol: currentProfile.soundVol,
+    musicVol: currentProfile.musicVol
+  };
+  if (window.savePlayer) {
+    await window.savePlayer(dataToSave);
+  }
+  // Показываем "СОХРАНЕНО"
+  var btn = document.querySelector('.gear-menu-btn.save');
+  if (btn) {
+    var old = btn.textContent;
+    btn.textContent = 'СОХРАНЕНО ✓';
+    setTimeout(function() {
+      btn.textContent = old;
+      closeGearMenu();
+    }, 800);
+  }
+};
+
+window.gearExit = function() {
+  playClick();
+  closeGearMenu();
+  // Стоп музыка
+  stopMenuMusic();
+  // Показать меню
+  document.getElementById('game').className = '';
+  document.getElementById('menu').className = 'visible';
+  // Музыка меню
+  startMenuMusic();
+};
