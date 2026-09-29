@@ -322,30 +322,31 @@ body {
 }
 #player-rank-icons img { width: 16px; height: 16px; }
 
-/* Правый блок: ресурсы + армия */
+/* Правый блок */
 #right-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   pointer-events: auto;
   max-width: calc(100% - 130px);
 }
 
-/* Ресурсы (3 чипа в ряд) */
 #resource-chips {
   display: flex;
-  gap: 5px;
+  gap: 3px;
 }
+
+/* Чипы ресурсов — ещё компактнее */
 .chip {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 8px;
+  gap: 3px;
+  padding: 2px 6px;
   background: rgba(10, 14, 26, 0.92);
   border: 2px solid #d4a020;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: bold;
   color: #fff;
@@ -358,40 +359,122 @@ body {
   text-overflow: ellipsis;
 }
 .chip-icon {
-  width: 20px; height: 20px;
-  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
   flex-shrink: 0;
-  box-shadow: inset 0 0 6px rgba(0,0,0,0.6), 0 0 6px rgba(0,0,0,0.4);
 }
-.chip-icon-metal   { background: radial-gradient(circle at 35% 30%, #e0e0e0, #808080 60%, #4a4a4a); }
-.chip-icon-crystal { background: radial-gradient(circle at 35% 30%, #b0f0ff, #00b0e0 60%, #006080); }
-.chip-icon-energy  { background: radial-gradient(circle at 35% 30%, #fff0a0, #e0b020 60%, #806000); }
 
-/* Длинная полоса АРМИЯ */
+/* Полоса АРМИЯ — ещё тоньше */
 #army-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
+  gap: 5px;
+  padding: 2px 12px;
   background: linear-gradient(90deg, rgba(60, 10, 10, 0.92), rgba(20, 6, 6, 0.92));
   border: 2px solid #d4a020;
-  border-radius: 14px;
-  font-size: 13px;
+  border-radius: 10px;
+  font-size: 12px;
   font-weight: bold;
   color: #fff;
   letter-spacing: 1px;
   box-shadow: 0 0 10px rgba(212, 160, 32, 0.3);
 }
 .army-icon {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ff8080, #a01010 60%, #500000);
-  box-shadow: inset 0 0 6px rgba(0,0,0,0.6), 0 0 8px rgba(200, 40, 40, 0.5);
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
   flex-shrink: 0;
 }
 #army-bar span {
   flex: 1;
   text-align: center;
+}
+
+/* ===== ШЕСТЕРЁНКА ===== */
+#gear-btn {
+  position: fixed;
+  top: 65px;
+  left: 34%;
+  width: 38px;
+  height: 38px;
+  z-index: 16;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#gear-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(212, 160, 32, 0.6));
+}
+#gear-btn:active img {
+  transform: scale(0.92);
+}
+
+/* ===== МЕНЮ ШЕСТЕРЁНКИ ===== */
+#gear-menu {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 60;
+  align-items: center;
+  justify-content: center;
+}
+#gear-menu.visible {
+  display: flex;
+}
+#gear-menu img.bg {
+  position: absolute; top:0; left:0;
+  width: 100%; height: 100%; object-fit: cover;
+}
+#gear-menu .dark {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.8);
+}
+#gear-menu-content {
+  position: relative;
+  z-index: 2;
+  width: 80%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: center;
+}
+#gear-menu-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #d4a020;
+  letter-spacing: 3px;
+  margin-bottom: 6px;
+  text-shadow: 0 0 10px rgba(0,0,0,0.9);
+}
+.gear-menu-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  border: 2px solid #d4a020;
+  background: rgba(10, 20, 48, 0.95);
+  color: #d4a020;
+}
+.gear-menu-btn.save {
+  border-color: #00e0d0;
+  color: #00e0d0;
+}
+.gear-menu-btn.exit {
+  border-color: #d44020;
+  color: #ff7050;
+}
+.gear-menu-btn.cancel {
+  border-color: #888;
+  color: #bbb;
 }
 
 /* ===== НИЖНЯЯ ПАНЕЛЬ ===== */
