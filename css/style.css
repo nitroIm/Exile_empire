@@ -337,7 +337,6 @@ body {
   gap: 3px;
 }
 
-/* Чипы ресурсов — ещё компактнее */
 .chip {
   flex: 1;
   display: flex;
@@ -365,7 +364,6 @@ body {
   flex-shrink: 0;
 }
 
-/* Полоса АРМИЯ — ещё тоньше */
 #army-bar {
   display: flex;
   align-items: center;
@@ -394,8 +392,8 @@ body {
 /* ===== ШЕСТЕРЁНКА ===== */
 #gear-btn {
   position: fixed;
-  top: 65px;
-  left: 34%;
+  top: 175px;
+  left: 38%;
   width: 38px;
   height: 38px;
   z-index: 16;
@@ -464,18 +462,9 @@ body {
   background: rgba(10, 20, 48, 0.95);
   color: #d4a020;
 }
-.gear-menu-btn.save {
-  border-color: #00e0d0;
-  color: #00e0d0;
-}
-.gear-menu-btn.exit {
-  border-color: #d44020;
-  color: #ff7050;
-}
-.gear-menu-btn.cancel {
-  border-color: #888;
-  color: #bbb;
-}
+.gear-menu-btn.save { border-color: #00e0d0; color: #00e0d0; }
+.gear-menu-btn.exit { border-color: #d44020; color: #ff7050; }
+.gear-menu-btn.cancel { border-color: #888; color: #bbb; }
 
 /* ===== НИЖНЯЯ ПАНЕЛЬ ===== */
 #bottom-bar {
@@ -485,29 +474,7 @@ body {
   background-size: 100% 100%;
   background-repeat: no-repeat;
   z-index: 20;
-  transition: transform 0.35s ease;
   padding: 40px 25px 35px 25px;
-  max-height: 75vh;
-}
-#panel-handle {
-  position: absolute; top: -12px; left: 50%;
-  transform: translateX(-50%);
-  width: 60px; height: 24px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; z-index: 25;
-}
-.handle-bar {
-  width: 50px; height: 4px;
-  background: #00e0d0; border-radius: 2px; opacity: 0.7;
-}
-#extra-row {
-  display: flex; justify-content: space-around; align-items: center;
-  padding: 0 6px 4px;
-  overflow: hidden; max-height: 0; opacity: 0;
-  transition: max-height 0.35s ease, opacity 0.35s ease;
-}
-#bottom-bar.expanded #extra-row {
-  max-height: 90px; opacity: 1; margin-bottom: 4px;
 }
 #main-row {
   display: flex; justify-content: space-around; align-items: center;
@@ -520,7 +487,6 @@ body {
   padding: 4px 4px; margin: 0 2px;
   border-radius: 12px;
   background: transparent;
-  transition: all 0.2s;
   transform: translateY(0);
 }
 #main-row .bottom-btn:nth-child(2),
@@ -536,5 +502,3 @@ body {
 .bottom-btn.big img { width: 44px; height: 44px; }
 .bottom-btn.big span { font-size: 10px; color: #fff; }
 .bottom-btn.big { background: transparent; border: none; margin-bottom: 0; }
-.bottom-btn.active { background: rgba(0, 224, 208, 0.15); }
-.bottom-btn.active span { color: #d4a020; }
