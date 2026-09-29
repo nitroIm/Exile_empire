@@ -42,7 +42,7 @@ var currentProfile = {
 };
 
 // ============================================
-// МУЗЫКА через HOWLER.JS
+// ЗВУКИ через HOWLER.JS
 // ============================================
 var musicMenu = new Howl({
   src: ['sounds/music_menu.mp3'],
@@ -51,18 +51,37 @@ var musicMenu = new Howl({
   html5: false,
   preload: true,
   onload: function() { console.log('🎵 Музыка загружена'); },
-  onloaderror: function(id, e) { console.log('❌ Ошибка загрузки музыки:', e); },
+  onloaderror: function(id, e) { console.log('❌ Музыка не загрузилась:', e); },
   onplayerror: function(id, e) {
     console.log('❌ Ошибка воспроизведения:', e);
     musicMenu.once('unlock', function() { musicMenu.play(); });
   }
 });
 
+var soundClick = new Howl({
+  src: ['sounds/click.mp3'],
+  volume: 0.7,
+  html5: false,
+  preload: true,
+  onload: function() { console.log('🖱 Клик загружен'); },
+  onloaderror: function(id, e) { console.log('❌ Клик не загрузился:', e); }
+});
+
 function updateMusicVolume() {
   var v = Math.max(0, Math.min(1, currentProfile.musicVol / 100));
   musicMenu.volume(v);
-  console.log('🔊 Music volume =', v);
-  return v;
+  console.log('🔊 Музыка volume =', v);
+}
+
+function updateClickVolume() {
+  var v = Math.max(0, Math.min(1, currentProfile.soundVol / 100));
+  soundClick.volume(v);
+}
+
+function playClick() {
+  if (!currentProfile.soundOn) return;
+  updateClickVolume();
+  soundClick.play();
 }
 
 function startMenuMusic() {
@@ -78,6 +97,27 @@ function stopMenuMusic() {
   if (musicMenu.playing()) {
     musicMenu.pause();
   }
+}
+
+// Автопривязка клика ко всем кнопкам
+function attachClickSounds() {
+  var selectors = [
+    '.menu-btn',
+    '.bottom-btn',
+    '#profile-save',
+    '#profile-back',
+    '.vol-btn',
+    '.profile-toggle',
+    '.profile-mini-btn',
+    '#panel-handle',
+    '#profile-back-bottom'
+  ];
+  selectors.forEach(function(sel) {
+    document.querySelectorAll(sel).forEach(function(el) {
+      el.addEventListener('touchstart', playClick, { passive: true });
+      el.addEventListener('click', playClick);
+    });
+  });
 }
 
 // ============ СБОРКА МИРА ============
@@ -184,6 +224,7 @@ var loaderInterval = setInterval(function() {
       document.getElementById('splash').className = 'hidden';
       document.getElementById('menu').className = 'visible';
 
+      attachClickSounds();
       startMenuMusic();
 
       var startOnce = function() {
@@ -255,6 +296,7 @@ window.applyProfileData = function(data) {
   }
 
   updateMusicVolume();
+  updateClickVolume();
 };
 
 // ============================================
@@ -525,13 +567,14 @@ window.uploadAvatar = function() {
 })();
 
 // ============================================
-// ГРОМКОСТЬ — Howler.js
+// ГРОМКОСТЬ
 // ============================================
 window.changeVolume = function(type, delta) {
   if (type === 'sound') {
     currentProfile.soundVol = Math.max(0, Math.min(100, currentProfile.soundVol + delta));
     var el = document.getElementById('vol-sound-val');
     if (el) el.textContent = currentProfile.soundVol + '%';
+    updateClickVolume();
   } else {
     currentProfile.musicVol = Math.max(0, Math.min(100, currentProfile.musicVol + delta));
     var el2 = document.getElementById('vol-music-val');
