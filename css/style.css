@@ -72,17 +72,6 @@ body {
   background: rgba(0,0,0,0.7);
 }
 
-#profile-back {
-  position: absolute;
-  top: 18px; left: 20px;
-  font-size: 14px; font-weight: bold; color: #d4a020;
-  letter-spacing: 1px; padding: 8px 14px;
-  border: 2px solid #d4a020; border-radius: 10px;
-  background: rgba(10, 14, 26, 0.7);
-  z-index: 3;
-}
-
-/* Обёртка рамки — по центру экрана */
 #profile-frame-wrap {
   position: absolute;
   top: 50%; left: 50%;
@@ -92,8 +81,6 @@ body {
   aspect-ratio: 9 / 16;
   z-index: 2;
 }
-
-/* Сама картинка рамки */
 #profile-frame-wrap .frame-big {
   position: absolute;
   top: 0; left: 0;
@@ -101,17 +88,16 @@ body {
   pointer-events: none;
 }
 
-/* Внутреннее содержимое — поверх синего стекла */
 #profile-inner {
   position: absolute;
-  top: 14%;
-  left: 18%;
-  right: 18%;
-  bottom: 12%;
+  top: 12%;
+  left: 16%;
+  right: 16%;
+  bottom: 18%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
 }
 
 #profile-title {
@@ -120,12 +106,12 @@ body {
   color: #d4a020;
   letter-spacing: 3px;
   text-shadow: 0 0 10px rgba(0,0,0,0.9);
-  margin-bottom: 6px;
+  margin-bottom: 2px;
 }
 
 #profile-avatar-big {
-  width: 100px;
-  height: 100px;
+  width: 85px;
+  height: 85px;
   border-radius: 50%;
   border: 3px solid #d4a020;
   overflow: hidden;
@@ -134,16 +120,78 @@ body {
 }
 #profile-avatar-big img { width: 100%; height: 100%; object-fit: cover; }
 
+.profile-avatar-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+.profile-mini-btn {
+  flex: 1;
+  max-width: 200px;
+  padding: 6px 10px;
+  background: rgba(10, 20, 48, 0.85);
+  border: 2px solid #d4a020;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 9px;
+  font-weight: bold;
+  color: #d4a020;
+  letter-spacing: 0.5px;
+}
+
+/* Обычная строка (ИМЯ) */
 .profile-row {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 7px 12px;
   background: rgba(10, 20, 48, 0.7);
   border: 2px solid #d4a020;
   border-radius: 10px;
 }
+
+/* Двойная строка (ЗВУК, МУЗЫКА) */
+.profile-row-double {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 8px 12px;
+}
+.profile-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.profile-volume {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.vol-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a1430;
+  border: 2px solid #d4a020;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #d4a020;
+}
+.vol-value {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
 .profile-label {
   font-size: 12px;
   font-weight: bold;
@@ -179,19 +227,41 @@ body {
   color: #777;
 }
 
+/* СОХРАНИТЬ — 20px от низа рамки */
 #profile-save {
-  width: 100%;
-  padding: 14px;
+  position: absolute;
+  bottom: 20px;
+  left: 16%;
+  right: 16%;
+  padding: 11px;
   background: rgba(10, 20, 48, 0.95);
   border: 2px solid #d4a020;
   border-radius: 12px;
   text-align: center;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
   color: #d4a020;
   letter-spacing: 3px;
-  margin-top: auto;
   box-shadow: 0 0 16px rgba(212, 160, 32, 0.5);
+}
+
+/* НАЗАД — -30px (ниже рамки) */
+#profile-back {
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  min-width: 120px;
+  padding: 8px 22px;
+  background: rgba(10, 20, 48, 0.85);
+  border: 2px solid #d4a020;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #d4a020;
+  letter-spacing: 2px;
 }
 
 /* ===== ИГРА ===== */
