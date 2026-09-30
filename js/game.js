@@ -39,23 +39,27 @@ var currentProfile = {
   musicOn: true,
   soundVol: 70,
   musicVol: 40,
-  army: 0
+  army: 0,
+  metal: 500,
+  crystal: 200,
+  energy: 100,
+  buildings: {}
 };
 
 // ============================================
-// ЗВАНИЯ (по числу армии)
+// ЗВАНИЯ
 // ============================================
 var RANKS = [
-  { min: 0,      name: 'РЯДОВОЙ',           icon: 'ui/ranks/rank_01.PNG' },
-  { min: 10,     name: 'ЕФРЕЙТОР',          icon: 'ui/ranks/rank_02.PNG' },
-  { min: 20,     name: 'МЛАДШИЙ СЕРЖАНТ',   icon: 'ui/ranks/rank_03.PNG' },
-  { min: 50,     name: 'СЕРЖАНТ',           icon: 'ui/ranks/rank_04.PNG' },
-  { min: 100,    name: 'СТАРШИЙ СЕРЖАНТ',   icon: 'ui/ranks/rank_05.PNG' },
-  { min: 200,    name: 'СТАРШИНА',          icon: 'ui/ranks/rank_06.PNG' },
-  { min: 400,    name: 'ПРАПОРЩИК',         icon: 'ui/ranks/rank_07.PNG' },
-  { min: 700,    name: 'ЛЕЙТЕНАНТ',         icon: 'ui/ranks/rank_08.PNG' },
-  { min: 1000,   name: 'КАПИТАН',           icon: 'ui/ranks/rank_09.PNG' },
-  { min: 2000,   name: 'МАЙОР',             icon: 'ui/ranks/rank_10.PNG' }
+  { min: 0,    name: 'РЯДОВОЙ',         icon: 'ui/ranks/rank_01.PNG' },
+  { min: 10,   name: 'ЕФРЕЙТОР',        icon: 'ui/ranks/rank_02.PNG' },
+  { min: 20,   name: 'МЛАДШИЙ СЕРЖАНТ', icon: 'ui/ranks/rank_03.PNG' },
+  { min: 50,   name: 'СЕРЖАНТ',         icon: 'ui/ranks/rank_04.PNG' },
+  { min: 100,  name: 'СТАРШИЙ СЕРЖАНТ', icon: 'ui/ranks/rank_05.PNG' },
+  { min: 200,  name: 'СТАРШИНА',        icon: 'ui/ranks/rank_06.PNG' },
+  { min: 400,  name: 'ПРАПОРЩИК',       icon: 'ui/ranks/rank_07.PNG' },
+  { min: 700,  name: 'ЛЕЙТЕНАНТ',       icon: 'ui/ranks/rank_08.PNG' },
+  { min: 1000, name: 'КАПИТАН',         icon: 'ui/ranks/rank_09.PNG' },
+  { min: 2000, name: 'МАЙОР',           icon: 'ui/ranks/rank_10.PNG' }
 ];
 
 function getRankByArmy(army) {
@@ -75,7 +79,7 @@ function updateRankDisplay() {
 }
 
 // ============================================
-// ЗВУКИ через HOWLER.JS
+// ЗВУКИ
 // ============================================
 var musicMenu = new Howl({
   src: ['sounds/music_menu.mp3'],
@@ -123,12 +127,11 @@ function stopMenuMusic() {
   if (musicMenu.playing()) musicMenu.pause();
 }
 
-// Автопривязка клика
 function attachClickSounds() {
   var selectors = [
     '.menu-btn', '.bottom-btn', '#profile-save', '#profile-back',
     '.vol-btn', '.profile-toggle', '.profile-mini-btn',
-    '#gear-btn', '.gear-menu-btn'
+    '#gear-btn', '.gear-menu-btn', '#shop-back', '.shop-item-btn'
   ];
   selectors.forEach(function(sel) {
     document.querySelectorAll(sel).forEach(function(el) {
@@ -271,6 +274,10 @@ window.applyProfileData = function(data) {
   if (typeof data.soundVol !== 'undefined') currentProfile.soundVol = data.soundVol;
   if (typeof data.musicVol !== 'undefined') currentProfile.musicVol = data.musicVol;
   if (typeof data.army !== 'undefined') currentProfile.army = data.army;
+  if (typeof data.metal !== 'undefined') currentProfile.metal = data.metal;
+  if (typeof data.crystal !== 'undefined') currentProfile.crystal = data.crystal;
+  if (typeof data.energy !== 'undefined') currentProfile.energy = data.energy;
+  if (typeof data.buildings !== 'undefined') currentProfile.buildings = data.buildings;
 
   var playerName = document.getElementById('player-name');
   if (playerName) playerName.textContent = currentProfile.name;
@@ -301,22 +308,12 @@ window.applyProfileData = function(data) {
   if (soundVolVal) soundVolVal.textContent = currentProfile.soundVol + '%';
   if (musicVolVal) musicVolVal.textContent = currentProfile.musicVol + '%';
 
-  if (typeof data.metal !== 'undefined') {
-    var metal = document.getElementById('metal');
-    if (metal) metal.textContent = data.metal;
-  }
-  if (typeof data.crystal !== 'undefined') {
-    var crystal = document.getElementById('crystal');
-    if (crystal) crystal.textContent = data.crystal;
-  }
-  if (typeof data.stars !== 'undefined') {
-    var stars = document.getElementById('stars');
-    if (stars) stars.textContent = data.stars;
-  }
-  if (typeof data.energy !== 'undefined') {
-    var energy = document.getElementById('energy');
-    if (energy) energy.textContent = data.energy;
-  }
+  var metal = document.getElementById('metal');
+  if (metal) metal.textContent = currentProfile.metal;
+  var crystal = document.getElementById('crystal');
+  if (crystal) crystal.textContent = currentProfile.crystal;
+  var energy = document.getElementById('energy');
+  if (energy) energy.textContent = currentProfile.energy;
 
   var armyEl = document.getElementById('army');
   if (armyEl) armyEl.textContent = currentProfile.army;
@@ -375,6 +372,57 @@ window.closeProfileScreen = function() {
   document.getElementById('profile-screen').className = '';
   document.getElementById('menu').className = 'visible';
   if (currentProfile.musicOn) startMenuMusic();
+};
+
+// ============================================
+// ШЕСТЕРЁНКА / МЕНЮ ПАУЗЫ
+// ============================================
+window.openGearMenu = function() {
+  playClick();
+  document.getElementById('gear-menu').className = 'visible';
+};
+
+window.closeGearMenu = function() {
+  playClick();
+  document.getElementById('gear-menu').className = '';
+};
+
+window.gearSave = async function() {
+  playClick();
+  var dataToSave = {
+    name: currentProfile.name,
+    avatar: currentProfile.avatar,
+    soundOn: currentProfile.soundOn,
+    musicOn: currentProfile.musicOn,
+    soundVol: currentProfile.soundVol,
+    musicVol: currentProfile.musicVol,
+    army: currentProfile.army,
+    metal: currentProfile.metal,
+    crystal: currentProfile.crystal,
+    energy: currentProfile.energy,
+    buildings: currentProfile.buildings
+  };
+  if (window.savePlayer) {
+    await window.savePlayer(dataToSave);
+  }
+  var btn = document.querySelector('.gear-menu-btn.save');
+  if (btn) {
+    var old = btn.textContent;
+    btn.textContent = 'СОХРАНЕНО ✓';
+    setTimeout(function() {
+      btn.textContent = old;
+      closeGearMenu();
+    }, 800);
+  }
+};
+
+window.gearExit = function() {
+  playClick();
+  closeGearMenu();
+  stopMenuMusic();
+  document.getElementById('game').className = '';
+  document.getElementById('menu').className = 'visible';
+  startMenuMusic();
 };
 
 // ============================================
@@ -590,7 +638,101 @@ window.changeVolume = function(type, delta) {
 };
 
 // ============================================
-// ФУНКЦИЯ ОБНОВЛЕНИЯ АРМИИ (для будущего)
+// МАГАЗИН ЗДАНИЙ
+// ============================================
+var BUILDINGS_CATALOG = {
+  mine:      { name: 'РУДНИК',      cost: { metal: 300 },              desc: '+10 металла/мин' },
+  shaft:     { name: 'ШАХТА',       cost: { metal: 400, crystal: 100 }, desc: '+5 кристалла/мин' },
+  generator: { name: 'ГЕНЕРАТОР',   cost: { metal: 500 },              desc: '+8 энергии/мин' },
+  barracks:  { name: 'КАЗАРМА',     cost: { metal: 600 },              desc: '+5 армии/мин' },
+  lab:       { name: 'ЛАБОРАТОРИЯ', cost: { metal: 800, crystal: 200 }, desc: 'Открывает технологии' }
+};
+
+window.openShop = function() {
+  if (tg) tg.HapticFeedback?.impactOccurred('light');
+  updateShopUI();
+  document.getElementById('shop-screen').className = 'visible';
+};
+
+window.closeShopScreen = function() {
+  if (tg) tg.HapticFeedback?.impactOccurred('light');
+  document.getElementById('shop-screen').className = '';
+};
+
+function updateShopUI() {
+  var m = currentProfile.metal || 0;
+  var c = currentProfile.crystal || 0;
+  var e = currentProfile.energy || 0;
+
+  var sm = document.getElementById('shop-metal');
+  var sc = document.getElementById('shop-crystal');
+  var se = document.getElementById('shop-energy');
+  if (sm) sm.textContent = m;
+  if (sc) sc.textContent = c;
+  if (se) se.textContent = e;
+
+  document.querySelectorAll('.shop-item').forEach(function(el) {
+    var id = el.dataset.id;
+    var b = BUILDINGS_CATALOG[id];
+    if (!b) return;
+
+    var canBuy = true;
+    if (b.cost.metal && m < b.cost.metal) canBuy = false;
+    if (b.cost.crystal && c < b.cost.crystal) canBuy = false;
+
+    var btn = el.querySelector('.shop-item-btn');
+    if (btn) btn.classList.toggle('disabled', !canBuy);
+  });
+}
+
+window.buyBuilding = function(id) {
+  var b = BUILDINGS_CATALOG[id];
+  if (!b) return;
+
+  var m = currentProfile.metal || 0;
+  var c = currentProfile.crystal || 0;
+
+  if (b.cost.metal && m < b.cost.metal) {
+    alert('Не хватает металла!');
+    return;
+  }
+  if (b.cost.crystal && c < b.cost.crystal) {
+    alert('Не хватает кристаллов!');
+    return;
+  }
+
+  if (b.cost.metal) currentProfile.metal -= b.cost.metal;
+  if (b.cost.crystal) currentProfile.crystal -= b.cost.crystal;
+
+  if (!currentProfile.buildings[id]) currentProfile.buildings[id] = 0;
+  currentProfile.buildings[id]++;
+
+  var metalEl = document.getElementById('metal');
+  var crystalEl = document.getElementById('crystal');
+  if (metalEl) metalEl.textContent = currentProfile.metal;
+  if (crystalEl) crystalEl.textContent = currentProfile.crystal;
+
+  updateShopUI();
+
+  if (tg) tg.HapticFeedback?.impactOccurred('medium');
+  var btn = document.querySelector('.shop-item[data-id="' + id + '"] .shop-item-btn');
+  if (btn) {
+    var old = btn.textContent;
+    btn.textContent = 'КУПЛЕНО ✓';
+    setTimeout(function() { btn.textContent = old; }, 800);
+  }
+
+  if (window.savePlayer) {
+    window.savePlayer({
+      metal: currentProfile.metal,
+      crystal: currentProfile.crystal,
+      buildings: currentProfile.buildings
+    });
+  }
+};
+
+// ============================================
+// АРМИЯ
 // ============================================
 window.setArmy = function(value) {
   currentProfile.army = Math.max(0, value);
@@ -610,7 +752,6 @@ window.openBase    = function() { if (tg) tg.HapticFeedback?.impactOccurred('lig
 window.openArmy    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Армия: ' + currentProfile.army); };
 window.openFight   = function() { if (tg) tg.HapticFeedback?.impactOccurred('medium'); alert('Бой'); };
 window.openMap     = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Карта'); };
-window.openShop    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Магазин'); };
 window.openScience = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Наука'); };
 window.openFleet   = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Флот'); };
 window.openClan    = function() { if (tg) tg.HapticFeedback?.impactOccurred('light'); alert('Клан'); };
