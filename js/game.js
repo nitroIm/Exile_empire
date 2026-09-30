@@ -33,16 +33,10 @@ var hero = {
 
 // ============ ПРОФИЛЬ ============
 var currentProfile = {
-  name: 'АДМИРАЛ',
-  avatar: '',
-  soundOn: true,
-  musicOn: true,
-  soundVol: 70,
-  musicVol: 40,
-  army: 0,
-  metal: 500,
-  crystal: 200,
-  energy: 100,
+  name: 'АДМИРАЛ', avatar: '',
+  soundOn: true, musicOn: true,
+  soundVol: 70, musicVol: 40,
+  army: 0, metal: 500, crystal: 200, energy: 100,
   buildings: {}
 };
 
@@ -117,14 +111,20 @@ function playClick() {
   updateClickVolume();
   soundClick.play();
 }
+
 function startMenuMusic() {
   if (!currentProfile.musicOn) return;
   if (document.getElementById('game').classList.contains('visible')) return;
   updateMusicVolume();
-  if (!musicMenu.playing()) musicMenu.play();
+  if (!musicMenu.playing()) {
+    musicMenu.play();
+  }
 }
+
 function stopMenuMusic() {
-  if (musicMenu.playing()) musicMenu.pause();
+  if (musicMenu.playing()) {
+    musicMenu.pause();
+  }
 }
 
 function attachClickSounds() {
@@ -224,7 +224,7 @@ var tg = window.Telegram ? window.Telegram.WebApp : null;
 if (tg) { tg.ready(); tg.expand(); }
 
 // ============================================
-// ЗАГРУЗЧИК
+// ЗАГРУЗЧИК → МЕНЮ + МУЗЫКА АВТОМАТОМ
 // ============================================
 var loaderProgress = 0;
 var loaderStart = Date.now();
@@ -245,16 +245,10 @@ var loaderInterval = setInterval(function() {
       document.getElementById('splash').className = 'hidden';
       document.getElementById('menu').className = 'visible';
 
-      attachClickSounds();
+      // Автозапуск музыки (работает в Telegram)
       startMenuMusic();
 
-      var startOnce = function() {
-        startMenuMusic();
-        document.removeEventListener('touchstart', startOnce);
-        document.removeEventListener('click', startOnce);
-      };
-      document.addEventListener('touchstart', startOnce);
-      document.addEventListener('click', startOnce);
+      attachClickSounds();
 
       if (window.loadPlayer) window.loadPlayer();
     }, 400);
@@ -314,7 +308,6 @@ window.applyProfileData = function(data) {
   if (crystal) crystal.textContent = currentProfile.crystal;
   var energy = document.getElementById('energy');
   if (energy) energy.textContent = currentProfile.energy;
-
   var armyEl = document.getElementById('army');
   if (armyEl) armyEl.textContent = currentProfile.army;
 
@@ -355,9 +348,7 @@ function fillProfileFromTelegram() {
   if (nameField && !nameField.value) {
     nameField.value = (u.first_name || u.username || 'Адмирал').slice(0, 15);
   }
-  if (u.photo_url && avatarBig) {
-    avatarBig.src = u.photo_url;
-  }
+  if (u.photo_url && avatarBig) avatarBig.src = u.photo_url;
 }
 
 window.openProfileScreen = function() {
@@ -375,18 +366,16 @@ window.closeProfileScreen = function() {
 };
 
 // ============================================
-// ШЕСТЕРЁНКА / МЕНЮ ПАУЗЫ
+// ШЕСТЕРЁНКА
 // ============================================
 window.openGearMenu = function() {
   playClick();
   document.getElementById('gear-menu').className = 'visible';
 };
-
 window.closeGearMenu = function() {
   playClick();
   document.getElementById('gear-menu').className = '';
 };
-
 window.gearSave = async function() {
   playClick();
   var dataToSave = {
@@ -402,9 +391,7 @@ window.gearSave = async function() {
     energy: currentProfile.energy,
     buildings: currentProfile.buildings
   };
-  if (window.savePlayer) {
-    await window.savePlayer(dataToSave);
-  }
+  if (window.savePlayer) await window.savePlayer(dataToSave);
   var btn = document.querySelector('.gear-menu-btn.save');
   if (btn) {
     var old = btn.textContent;
@@ -415,7 +402,6 @@ window.gearSave = async function() {
     }, 800);
   }
 };
-
 window.gearExit = function() {
   playClick();
   closeGearMenu();
@@ -431,7 +417,6 @@ window.gearExit = function() {
 (function initSave() {
   var saveBtn = document.getElementById('profile-save');
   if (!saveBtn) return;
-
   saveBtn.addEventListener('click', async function() {
     var nameInput = document.getElementById('profile-name-input');
     var avatarBig = document.getElementById('avatar-big-img');
@@ -449,7 +434,6 @@ window.gearExit = function() {
 
     var oldText = saveBtn.textContent;
     saveBtn.textContent = 'СОХРАНЕНИЕ...';
-
     if (window.savePlayer) await window.savePlayer(dataToSave);
 
     localStorage.setItem('profile_ready', '1');
@@ -675,11 +659,9 @@ function updateShopUI() {
     var id = el.dataset.id;
     var b = BUILDINGS_CATALOG[id];
     if (!b) return;
-
     var canBuy = true;
     if (b.cost.metal && m < b.cost.metal) canBuy = false;
     if (b.cost.crystal && c < b.cost.crystal) canBuy = false;
-
     var btn = el.querySelector('.shop-item-btn');
     if (btn) btn.classList.toggle('disabled', !canBuy);
   });
@@ -692,14 +674,8 @@ window.buyBuilding = function(id) {
   var m = currentProfile.metal || 0;
   var c = currentProfile.crystal || 0;
 
-  if (b.cost.metal && m < b.cost.metal) {
-    alert('Не хватает металла!');
-    return;
-  }
-  if (b.cost.crystal && c < b.cost.crystal) {
-    alert('Не хватает кристаллов!');
-    return;
-  }
+  if (b.cost.metal && m < b.cost.metal) { alert('Не хватает металла!'); return; }
+  if (b.cost.crystal && c < b.cost.crystal) { alert('Не хватает кристаллов!'); return; }
 
   if (b.cost.metal) currentProfile.metal -= b.cost.metal;
   if (b.cost.crystal) currentProfile.crystal -= b.cost.crystal;
@@ -740,10 +716,7 @@ window.setArmy = function(value) {
   if (armyEl) armyEl.textContent = currentProfile.army;
   updateRankDisplay();
 };
-
-window.addArmy = function(delta) {
-  window.setArmy(currentProfile.army + delta);
-};
+window.addArmy = function(delta) { window.setArmy(currentProfile.army + delta); };
 
 // ============================================
 // ЗАГЛУШКИ
